@@ -1,0 +1,265 @@
+@extends('layouts.admin')
+
+@section('title', 'Site Settings')
+@section('page-title', 'Site Settings')
+
+@section('content')
+
+  <form action="{{ route('admin.settings.update') }}" method="POST">
+    @csrf @method('PUT')
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">General</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Site name</label>
+          <input type="text" name="site_name" class="form-control" value="{{ old('site_name', $settings['site_name'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Tagline</label>
+          <input type="text" name="site_tagline" class="form-control" value="{{ old('site_tagline', $settings['site_tagline'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Default meta description</label>
+          <textarea name="site_description" rows="2" class="form-control">{{ old('site_description', $settings['site_description'] ?? '') }}</textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Logo URL</label>
+          <input type="text" name="logo" class="form-control" value="{{ old('logo', $settings['logo'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Favicon URL</label>
+          <input type="text" name="favicon" class="form-control" value="{{ old('favicon', $settings['favicon'] ?? '') }}" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Utility Strip &amp; Nav Banner</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Promo tag (e.g. SALE)</label>
+          <input type="text" name="utility_promo_tag" class="form-control" value="{{ old('utility_promo_tag', $settings['utility_promo_tag'] ?? '') }}" />
+        </div>
+        <div class="col-md-8">
+          <label class="form-label small fw-semibold">Utility strip text</label>
+          <input type="text" name="utility_text" class="form-control" value="{{ old('utility_text', $settings['utility_text'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Nav CTA prefix</label>
+          <input type="text" name="nav_cta_prefix" class="form-control" value="{{ old('nav_cta_prefix', $settings['nav_cta_prefix'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Nav CTA highlight</label>
+          <input type="text" name="nav_cta_highlight" class="form-control" value="{{ old('nav_cta_highlight', $settings['nav_cta_highlight'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Nav CTA suffix</label>
+          <input type="text" name="nav_cta_suffix" class="form-control" value="{{ old('nav_cta_suffix', $settings['nav_cta_suffix'] ?? '') }}" />
+        </div>
+      </div>
+      <hr class="my-3" />
+      <div class="row g-3">
+        @foreach([1, 2, 3] as $n)
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">Utility link {{ $n }} label</label>
+            <input type="text" name="utility_link{{ $n }}_label" class="form-control" value="{{ old("utility_link{$n}_label", $settings["utility_link{$n}_label"] ?? '') }}" />
+          </div>
+          <div class="col-md-8">
+            <label class="form-label small fw-semibold">Utility link {{ $n }} URL</label>
+            <input type="text" name="utility_link{{ $n }}_url" class="form-control" value="{{ old("utility_link{$n}_url", $settings["utility_link{$n}_url"] ?? '') }}" />
+          </div>
+        @endforeach
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Contact Info</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Email</label>
+          <input type="email" name="contact_email" class="form-control" value="{{ old('contact_email', $settings['contact_email'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Phone</label>
+          <input type="text" name="contact_phone" class="form-control" value="{{ old('contact_phone', $settings['contact_phone'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Address</label>
+          <textarea name="contact_address" rows="2" class="form-control">{{ old('contact_address', $settings['contact_address'] ?? '') }}</textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Hours (weekday)</label>
+          <input type="text" name="contact_hours_weekday" class="form-control" value="{{ old('contact_hours_weekday', $settings['contact_hours_weekday'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Hours (weekend)</label>
+          <input type="text" name="contact_hours_weekend" class="form-control" value="{{ old('contact_hours_weekend', $settings['contact_hours_weekend'] ?? '') }}" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Social Links</h6>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">Twitter</label>
+          <input type="text" name="social_twitter" class="form-control" value="{{ old('social_twitter', $settings['social_twitter'] ?? '') }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">LinkedIn</label>
+          <input type="text" name="social_linkedin" class="form-control" value="{{ old('social_linkedin', $settings['social_linkedin'] ?? '') }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">Instagram</label>
+          <input type="text" name="social_instagram" class="form-control" value="{{ old('social_instagram', $settings['social_instagram'] ?? '') }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">YouTube</label>
+          <input type="text" name="social_youtube" class="form-control" value="{{ old('social_youtube', $settings['social_youtube'] ?? '') }}" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Homepage Hero Banner</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Eyebrow label</label>
+          <input type="text" name="hero_eyebrow" class="form-control" value="{{ old('hero_eyebrow', $settings['hero_eyebrow'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">CTA button label</label>
+          <input type="text" name="hero_cta_label" class="form-control" value="{{ old('hero_cta_label', $settings['hero_cta_label'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Heading</label>
+          <input type="text" name="hero_heading" class="form-control" value="{{ old('hero_heading', $settings['hero_heading'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Description</label>
+          <textarea name="hero_description" rows="2" class="form-control">{{ old('hero_description', $settings['hero_description'] ?? '') }}</textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Image URL</label>
+          <input type="text" name="hero_image" class="form-control" value="{{ old('hero_image', $settings['hero_image'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Linked product slug</label>
+          <input type="text" name="hero_product_slug" class="form-control" value="{{ old('hero_product_slug', $settings['hero_product_slug'] ?? '') }}" />
+          <div class="form-text">Also used by the "Products" nav link.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Newsletter Section</h6>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">Prefix</label>
+          <input type="text" name="newsletter_prefix" class="form-control" value="{{ old('newsletter_prefix', $settings['newsletter_prefix'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Highlight (bold)</label>
+          <input type="text" name="newsletter_highlight" class="form-control" value="{{ old('newsletter_highlight', $settings['newsletter_highlight'] ?? '') }}" />
+        </div>
+        <div class="col-md-5">
+          <label class="form-label small fw-semibold">Suffix</label>
+          <input type="text" name="newsletter_suffix" class="form-control" value="{{ old('newsletter_suffix', $settings['newsletter_suffix'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Description</label>
+          <textarea name="newsletter_description" rows="2" class="form-control">{{ old('newsletter_description', $settings['newsletter_description'] ?? '') }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Trust Badges <span class="fw-normal text-muted small">(shown on cart &amp; product pages)</span></h6>
+      <div class="row g-3">
+        @foreach([
+          'trust_shipping' => 'Shipping',
+          'trust_returns' => 'Returns',
+          'trust_warranty' => 'Warranty',
+          'trust_authentic' => 'Authenticity',
+        ] as $prefix => $label)
+          <div class="col-md-3">
+            <label class="form-label small fw-semibold">{{ $label }} title</label>
+            <input type="text" name="{{ $prefix }}_title" class="form-control" value="{{ old("{$prefix}_title", $settings["{$prefix}_title"] ?? '') }}" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-semibold">{{ $label }} subtitle</label>
+            <input type="text" name="{{ $prefix }}_subtitle" class="form-control" value="{{ old("{$prefix}_subtitle", $settings["{$prefix}_subtitle"] ?? '') }}" />
+          </div>
+        @endforeach
+      </div>
+      <div class="form-text mt-2">Note: "Authenticity" subtitle is currently only used on the product page (the cart page shows 3 badges, not 4).</div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Contact Page Blocks</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Live chat label</label>
+          <input type="text" name="contact_livechat_label" class="form-control" value="{{ old('contact_livechat_label', $settings['contact_livechat_label'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Live chat status text</label>
+          <input type="text" name="contact_livechat_status" class="form-control" value="{{ old('contact_livechat_status', $settings['contact_livechat_status'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Trade desk heading</label>
+          <input type="text" name="contact_trade_heading" class="form-control" value="{{ old('contact_trade_heading', $settings['contact_trade_heading'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Trade desk CTA label</label>
+          <input type="text" name="contact_trade_cta_label" class="form-control" value="{{ old('contact_trade_cta_label', $settings['contact_trade_cta_label'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Trade desk description</label>
+          <textarea name="contact_trade_description" rows="2" class="form-control">{{ old('contact_trade_description', $settings['contact_trade_description'] ?? '') }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Homepage Sections</h6>
+      <div class="row g-2">
+        @foreach([
+          'section_hero_enabled' => 'Hero banner',
+          'section_trending_enabled' => 'Trending products',
+          'section_discounts_enabled' => 'Discount banners',
+          'section_categories_enabled' => 'Shop by category',
+          'section_just_for_you_enabled' => 'Just for you',
+          'section_brands_enabled' => 'Brand strip',
+          'section_newsletter_enabled' => 'Newsletter signup',
+        ] as $key => $label)
+          <div class="col-md-4">
+            <div class="form-check form-switch">
+              <input type="checkbox" name="{{ $key }}" value="1" class="form-check-input" id="{{ $key }}"
+                     @checked(old($key, ($settings[$key] ?? '1')) != '0') />
+              <label class="form-check-label small" for="{{ $key }}">{{ $label }}</label>
+            </div>
+          </div>
+        @endforeach
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Footer</h6>
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label small fw-semibold">About text</label>
+          <textarea name="footer_about_text" rows="2" class="form-control">{{ old('footer_about_text', $settings['footer_about_text'] ?? '') }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Copyright text</label>
+          <input type="text" name="footer_copyright" class="form-control" value="{{ old('footer_copyright', $settings['footer_copyright'] ?? '') }}" />
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-admin-primary">Save Settings</button>
+  </form>
+
+@endsection
