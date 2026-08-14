@@ -30,6 +30,41 @@ class PageMetaSeeder extends Seeder
                 'title' => 'Contact — Sprylo',
                 'meta_description' => 'Get in touch with Sprylo customer support — order help, returns, warranty claims, and partnership inquiries.',
             ],
+            [
+                'page_slug' => 'about',
+                'title' => 'About Us — Sprylo',
+                'meta_description' => 'Learn about Sprylo — our story, our team, and how to reach our flagship store.',
+            ],
+            [
+                'page_slug' => 'categories',
+                'title' => 'Categories — Sprylo',
+                'meta_description' => 'Browse the Sprylo catalogue by category — smartphones, laptops, cameras, audio, wearables, and gaming.',
+            ],
+            [
+                'page_slug' => 'brands',
+                'title' => 'Brands — Sprylo',
+                'meta_description' => 'Shop the Sprylo catalogue by brand.',
+            ],
+            [
+                'page_slug' => 'wishlist',
+                'title' => 'Wishlist — Sprylo',
+                'meta_description' => 'Products you have saved for later at Sprylo.',
+            ],
+            [
+                'page_slug' => 'help',
+                'title' => 'Help Centre — Sprylo',
+                'meta_description' => 'Answers to common questions about orders, shipping, returns, and warranty at Sprylo.',
+            ],
+            [
+                'page_slug' => 'privacy-policy',
+                'title' => 'Privacy Policy — Sprylo',
+                'meta_description' => 'How Sprylo collects, uses, and protects your personal information.',
+            ],
+            [
+                'page_slug' => 'checkout',
+                'title' => 'Checkout — Sprylo',
+                'meta_description' => 'Complete your order at Sprylo.',
+            ],
         ];
 
         foreach ($pages as $page) {

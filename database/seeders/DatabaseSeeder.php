@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             FaqSeeder::class,
             FooterLinkSeeder::class,
             ContactMessageSeeder::class,
+            PromoCodeSeeder::class,
         ]);
     }
 }

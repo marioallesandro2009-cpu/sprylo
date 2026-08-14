@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\PageMeta;
 use App\Models\Product;
+use App\Models\PromoCode;
+use App\Support\Cart;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,37 +16,8 @@ class CartController extends Controller
     {
         $pageMeta = PageMeta::forPage('cart');
 
-        $cart = session('cart', []);
-        $products = Product::with('images')->whereIn('id', array_keys($cart))->get()->keyBy('id');
-
-        $cartItems = collect($cart)
-            ->filter(fn ($qty, $productId) => $products->has($productId))
-            ->map(function ($qty, $productId) use ($products) {
-                $product = $products->get($productId);
-                $unitPrice = $product->sale_price ?? $product->price;
-
-                return [
-                    'product' => $product,
-                    'qty' => $qty,
-                    'unit_price' => $unitPrice,
-                    'subtotal' => $unitPrice * $qty,
-                ];
-            })
-            ->values();
-
-        $subtotal = $cartItems->sum('subtotal');
-        $shipping = ($subtotal > 0 && $subtotal < 50) ? 9.99 : 0.0;
-        $tax = round($subtotal * 0.08, 2);
-        $promoDiscount = 0.0;
-
-        $totals = [
-            'subtotal' => $subtotal,
-            'shipping' => $shipping,
-            'tax' => $tax,
-            'promo_code' => null,
-            'promo_discount' => $promoDiscount,
-            'total' => $subtotal + $shipping + $tax - $promoDiscount,
-        ];
+        $cartItems = Cart::items();
+        $totals = Cart::totals($cartItems);
 
         return view('pages.cart', compact('pageMeta', 'cartItems', 'totals'));
     }
@@ -94,5 +67,30 @@ class CartController extends Controller
         session(['cart' => $cart]);
 
         return redirect()->route('cart.index')->with('success', 'Item removed from cart.');
+    }
+
+    public function applyPromo(Request $request): RedirectResponse
+    {
+        $request->validate(['code' => ['required', 'string']]);
+
+        $code = strtoupper(trim($request->input('code')));
+        $subtotal = (float) Cart::items()->sum('subtotal');
+
+        $promo = PromoCode::where('code', $code)->active()->first();
+
+        if (! $promo || ! $promo->appliesTo($subtotal)) {
+            return redirect()->route('cart.index')->with('error', 'That promo code isn\'t valid for this order.');
+        }
+
+        session(['promo_code' => $promo->code]);
+
+        return redirect()->route('cart.index')->with('success', 'Promo code "'.$promo->code.'" applied.');
+    }
+
+    public function removePromo(): RedirectResponse
+    {
+        session()->forget('promo_code');
+
+        return redirect()->route('cart.index')->with('success', 'Promo code removed.');
     }
 }

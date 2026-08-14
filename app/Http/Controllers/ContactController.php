@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ContactMessage;
 use App\Models\Faq;
 use App\Models\PageMeta;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -33,6 +34,9 @@ class ContactController extends Controller
 
         ContactMessage::create($data);
 
-        return redirect()->route('contact.index')->with('success', 'Message sent — we will reply within 4 hours.');
+        $message = Setting::where('key', 'contact_reply_sla_text')->value('value')
+            ?? 'Message sent — we will reply within 4 hours.';
+
+        return redirect()->route('contact.index')->with('success', $message);
     }
 }

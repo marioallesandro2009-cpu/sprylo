@@ -16,19 +16,7 @@
     @include('partials.discount-banners')
   @endif
 
-  @if(($settings['section_categories_enabled'] ?? '1') !== '0')
-    @include('partials.categories')
-  @endif
-
   @if(($settings['section_just_for_you_enabled'] ?? '1') !== '0')
     @include('partials.just-for-you')
-  @endif
-
-  @if(($settings['section_brands_enabled'] ?? '1') !== '0')
-    @include('partials.brand-strip', ['brands' => $brands])
-  @endif
-
-  @if(($settings['section_newsletter_enabled'] ?? '1') !== '0')
-    @include('partials.newsletter')
   @endif
 @endsection

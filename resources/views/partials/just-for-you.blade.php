@@ -14,7 +14,7 @@
             <div>
               <div class="stock">IN STOCK · {{ $item->stock }}</div>
               <div class="name">{{ $item->name }}</div>
-              <div class="price">${{ number_format($item->sale_price ?? $item->price, 0) }}</div>
+              <div class="price">{{ rupiah($item->sale_price ?? $item->price) }}</div>
               <form action="{{ route('cart.add', $item) }}" method="POST">
                 @csrf
                 <button type="submit" class="btn" @disabled($item->stock < 1)>{{ $item->stock < 1 ? 'Out of stock' : 'Order Now' }}</button>

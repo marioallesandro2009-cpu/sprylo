@@ -17,7 +17,7 @@ class ProductController extends Controller
         $specs = [
             ['label' => 'Category', 'value' => $product->category->name],
             ['label' => 'Brand', 'value' => $product->brand->name ?? '—'],
-            ['label' => 'Price', 'value' => '$'.number_format($product->price, 2)],
+            ['label' => 'Price', 'value' => rupiah($product->price)],
             ['label' => 'Stock', 'value' => $product->stock.' units'],
             ['label' => 'Rating', 'value' => $product->reviews_count > 0
                 ? $product->rating_avg.' / 5 ('.$product->reviews_count.' reviews)'

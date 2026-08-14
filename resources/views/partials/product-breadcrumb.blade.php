@@ -1,0 +1,1 @@
+<div class="crumbs" style="padding-top: var(--s5)"><a href="{{ route('home') }}">Home</a> <span class="sep">›</span> <a href="{{ route('shop.index') }}">Shop</a> <span class="sep">›</span> <span>{{ $product->category->name }}</span></div>

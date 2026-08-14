@@ -193,7 +193,21 @@
           </div>
         @endforeach
       </div>
-      <div class="form-text mt-2">Note: "Authenticity" subtitle is currently only used on the product page (the cart page shows 3 badges, not 4).</div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Shipping</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Free shipping threshold (Rp)</label>
+          <input type="number" step="1" min="0" name="shipping_free_threshold" class="form-control" value="{{ old('shipping_free_threshold', $settings['shipping_free_threshold'] ?? '') }}" />
+          <div class="form-text">Orders at or above this subtotal ship free. Drives both the actual shipping cost and the "add Rp X more" message in the cart.</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Shipping fee below threshold (Rp)</label>
+          <input type="number" step="1" min="0" name="shipping_fee" class="form-control" value="{{ old('shipping_fee', $settings['shipping_fee'] ?? '') }}" />
+        </div>
+      </div>
     </div>
 
     <div class="card-admin mb-3">
@@ -219,6 +233,59 @@
           <label class="form-label small fw-semibold">Trade desk description</label>
           <textarea name="contact_trade_description" rows="2" class="form-control">{{ old('contact_trade_description', $settings['contact_trade_description'] ?? '') }}</textarea>
         </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Reply confirmation message</label>
+          <input type="text" name="contact_reply_sla_text" class="form-control" value="{{ old('contact_reply_sla_text', $settings['contact_reply_sla_text'] ?? '') }}" />
+          <div class="form-text">Shown after a visitor submits the contact form.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Privacy Policy Page</h6>
+      <div class="row g-3">
+        @foreach([
+          'privacy_collect' => 'Information we collect',
+          'privacy_use' => 'How we use it',
+          'privacy_cookies' => 'Cookies',
+          'privacy_contact' => 'Contact us',
+        ] as $prefix => $label)
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">{{ $label }} — heading</label>
+            <input type="text" name="{{ $prefix }}_heading" class="form-control" value="{{ old("{$prefix}_heading", $settings["{$prefix}_heading"] ?? '') }}" />
+          </div>
+          <div class="col-md-8">
+            <label class="form-label small fw-semibold">{{ $label }} — body</label>
+            <textarea name="{{ $prefix }}_body" rows="2" class="form-control">{{ old("{$prefix}_body", $settings["{$prefix}_body"] ?? '') }}</textarea>
+          </div>
+        @endforeach
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">About Page</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">About heading</label>
+          <input type="text" name="about_heading" class="form-control" value="{{ old('about_heading', $settings['about_heading'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">About image URL</label>
+          <input type="text" name="about_image" class="form-control" value="{{ old('about_image', $settings['about_image'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">About body</label>
+          <textarea name="about_body" rows="3" class="form-control">{{ old('about_body', $settings['about_body'] ?? '') }}</textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">History heading</label>
+          <input type="text" name="history_heading" class="form-control" value="{{ old('history_heading', $settings['history_heading'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">History body</label>
+          <textarea name="history_body" rows="3" class="form-control">{{ old('history_body', $settings['history_body'] ?? '') }}</textarea>
+        </div>
+        <div class="form-text">The Hours block on the About page reuses the "Hours (weekday/weekend)" fields from Contact Info above.</div>
       </div>
     </div>
 
@@ -229,10 +296,8 @@
           'section_hero_enabled' => 'Hero banner',
           'section_trending_enabled' => 'Trending products',
           'section_discounts_enabled' => 'Discount banners',
-          'section_categories_enabled' => 'Shop by category',
           'section_just_for_you_enabled' => 'Just for you',
-          'section_brands_enabled' => 'Brand strip',
-          'section_newsletter_enabled' => 'Newsletter signup',
+          'section_newsletter_enabled' => 'Newsletter signup (footer)',
         ] as $key => $label)
           <div class="col-md-4">
             <div class="form-check form-switch">
@@ -255,6 +320,11 @@
         <div class="col-12">
           <label class="form-label small fw-semibold">Copyright text</label>
           <input type="text" name="footer_copyright" class="form-control" value="{{ old('footer_copyright', $settings['footer_copyright'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Credit line</label>
+          <input type="text" name="footer_credit_text" class="form-control" value="{{ old('footer_credit_text', $settings['footer_credit_text'] ?? '') }}" />
+          <div class="form-text">Small text next to the copyright line. Leave blank to hide it.</div>
         </div>
       </div>
     </div>

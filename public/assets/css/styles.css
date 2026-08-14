@@ -91,7 +91,7 @@
 
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; background: var(--paper); }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; background: var(--paper); overflow-x: hidden; }
 body {
   margin: 0;
   font-family: var(--ff-body);
@@ -101,6 +101,7 @@ body {
   background: var(--paper);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 h1, h2, h3, h4, h5 {
   margin: 0;
@@ -496,6 +497,7 @@ input, select, textarea { font: inherit; color: inherit; }
   padding: 12px 0;
   position: relative;
   cursor: pointer;
+  white-space: nowrap;
 }
 .tab.is-active { color: var(--indigo); }
 .tab.is-active::after {
@@ -548,7 +550,7 @@ input, select, textarea { font: inherit; color: inherit; }
 .product-card .badge--sale { background: var(--rose); }
 .product-card .wishlist {
   position: absolute; top: 10px; right: 10px;
-  width: 32px; height: 32px;
+  width: 36px; height: 36px;
   background: var(--paper);
   border-radius: 999px;
   display: grid; place-items: center;
@@ -558,6 +560,10 @@ input, select, textarea { font: inherit; color: inherit; }
 }
 .product-card:hover .wishlist { opacity: 1; }
 .product-card .wishlist:hover { color: var(--rose); }
+.product-card .wishlist.is-active { opacity: 1; color: var(--rose); }
+@media (hover: none) {
+  .product-card .wishlist { opacity: 1; }
+}
 .product-card .stock {
   display: inline-flex; align-items: center; gap: 4px;
   font-family: var(--ff-mono); font-size: 11px;
@@ -577,7 +583,7 @@ input, select, textarea { font: inherit; color: inherit; }
   line-height: 1.3;
 }
 .product-card .price {
-  display: flex; align-items: baseline; gap: 8px;
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;
   margin-bottom: var(--s2);
 }
 .product-card .price .now {
@@ -655,7 +661,7 @@ input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Categories grid (round tiles) ---------- */
 .cats-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--s4);
 }
 .cat-tile {
@@ -695,7 +701,7 @@ input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Compact product row (4-up small cards) ---------- */
 .compact-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--s4);
 }
 .compact-card {
@@ -806,7 +812,7 @@ input, select, textarea { font: inherit; color: inherit; }
   align-items: center;
 }
 .newsletter-form input {
-  flex: 1; border: 0;
+  flex: 1; min-width: 0; border: 0;
   background: transparent;
   padding: 12px 18px;
   font-size: var(--text-base);
@@ -952,6 +958,7 @@ input, select, textarea { font: inherit; color: inherit; }
   max-height: calc(100vh - 200px);
   overflow-y: auto;
 }
+.filters-toggle { display: none; }
 .filters h3 {
   font-size: var(--text-sm);
   font-weight: 700;
@@ -1004,7 +1011,7 @@ input, select, textarea { font: inherit; color: inherit; }
 }
 .shop-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--s4);
 }
 .pagination {
@@ -1029,6 +1036,11 @@ input, select, textarea { font: inherit; color: inherit; }
   grid-template-columns: 1.1fr 1fr;
   gap: var(--s8);
   padding: var(--s7) 0 var(--s9);
+}
+.specs-reviews {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s8);
 }
 .gallery {
   display: grid;
@@ -1075,7 +1087,7 @@ input, select, textarea { font: inherit; color: inherit; }
   margin-bottom: var(--s4);
 }
 .pdp-info .price-row {
-  display: flex; align-items: baseline; gap: var(--s4);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s4);
   margin: var(--s5) 0 var(--s4);
   padding-top: var(--s5);
   border-top: 1px solid var(--rule);
@@ -1200,7 +1212,7 @@ input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Contact ---------- */
 .contact-grid {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
   gap: var(--s8);
   padding: var(--s7) 0 var(--s9);
 }
@@ -1208,10 +1220,11 @@ input, select, textarea { font: inherit; color: inherit; }
   padding: var(--s4) 0;
   border-bottom: 1px solid var(--rule);
   display: grid;
-  grid-template-columns: 48px 1fr;
+  grid-template-columns: 48px minmax(0, 1fr);
   gap: var(--s4);
   align-items: center;
 }
+.contact-info .info-block .value { overflow-wrap: break-word; }
 .contact-info .info-block:first-child { padding-top: 0; }
 .contact-info .ic {
   width: 48px; height: 48px;
@@ -1239,6 +1252,7 @@ input, select, textarea { font: inherit; color: inherit; }
 .field { display: grid; gap: var(--s2); margin-bottom: var(--s4); }
 .field label { font-family: var(--ff-mono); font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-soft); }
 .field input, .field select, .field textarea {
+  width: 100%; min-width: 0;
   padding: 12px 16px;
   border: 1px solid var(--rule-strong);
   border-radius: var(--r-sm);
@@ -1253,12 +1267,30 @@ input, select, textarea { font: inherit; color: inherit; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1180px) {
-  .products { grid-template-columns: repeat(4, 1fr); }
-  .compact-row { grid-template-columns: repeat(2, 1fr); }
-  .cats-grid { grid-template-columns: repeat(4, 1fr); }
+  /* Full nav row (categories + links + promo CTA) no longer fits on one line
+     below this width, so switch to the hamburger nav here instead of at the
+     760px phone breakpoint — it wraps to 2-3 lines inside a fixed-height bar
+     otherwise, overlapping the content below. */
+  .main-nav { display: none; }
+  .nav-toggle { display: block; }
+  .nav-cta { display: none; }
+  .products { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .compact-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: var(--s5); }
-  .shop-layout { grid-template-columns: 1fr; }
-  .filters { position: static; max-height: none; }
+  .shop-layout { grid-template-columns: minmax(0, 1fr); }
+  .filters { position: static; max-height: none; min-width: 0; display: none; }
+  .filters.is-open { display: block; }
+  .filters-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 14px 16px; margin-bottom: var(--s4);
+    background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r);
+    font-weight: 600; font-size: var(--text-sm); color: var(--ink); cursor: pointer;
+  }
+  .filters-toggle span { display: inline-flex; align-items: center; gap: 6px; }
+  .filters-toggle .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--indigo); }
+  .filters-toggle .chev { transition: transform 200ms var(--ease); }
+  .filters-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
 }
 @media (max-width: 960px) {
   .bento { grid-template-columns: 1fr; grid-template-rows: auto; }
@@ -1267,31 +1299,31 @@ input, select, textarea { font: inherit; color: inherit; }
   .bento-card--purple { grid-column: 1; grid-row: auto; }
   .bento-card--teal { grid-column: 1; grid-row: auto; }
   .bento-row { grid-column: 1; grid-row: auto; }
-  .products { grid-template-columns: repeat(3, 1fr); }
-  .cats-grid { grid-template-columns: repeat(3, 1fr); }
-  .discount-row { grid-template-columns: 1fr; }
-  .product-detail { grid-template-columns: 1fr; gap: var(--s6); }
-  .cart-layout { grid-template-columns: 1fr; }
+  .products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .discount-row { grid-template-columns: minmax(0, 1fr); }
+  .product-detail { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+  .specs-reviews { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+  .cart-layout { grid-template-columns: minmax(0, 1fr); }
   .cart-summary { position: static; }
-  .contact-grid { grid-template-columns: 1fr; gap: var(--s6); }
-  .newsletter-grid { grid-template-columns: 1fr; gap: var(--s5); }
+  .contact-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+  .newsletter-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 760px) {
   :root { --container-pad: 16px; }
   .site-header .container { grid-template-columns: auto 1fr auto; gap: var(--s4); height: 72px; }
   .search { display: none; }
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
   .nav-bar .container { gap: var(--s4); height: 56px; overflow-x: auto; }
-  .main-nav { display: none; }
-  .nav-toggle { display: block; }
-  .nav-cta { display: none; }
   .utility .links { display: none; }
-  .products { grid-template-columns: repeat(2, 1fr); }
-  .shop-grid { grid-template-columns: repeat(2, 1fr); }
-  .compact-row { grid-template-columns: 1fr; }
-  .cats-grid { grid-template-columns: repeat(2, 1fr); }
+  .products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .compact-row { grid-template-columns: minmax(0, 1fr); }
+  .cats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gallery { grid-template-columns: 1fr; }
-  .gallery-thumbs { grid-template-columns: repeat(4, 1fr); }
+  .gallery-thumbs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .cart-row { grid-template-columns: 60px 1fr; gap: var(--s3); }
   .cart-row .qty, .cart-row .subtotal, .cart-row .remove { grid-column: 2; justify-self: start; }
   .field-row { grid-template-columns: 1fr; }
@@ -1299,6 +1331,15 @@ input, select, textarea { font: inherit; color: inherit; }
   .footer-grid { grid-template-columns: 1fr; }
   .section { padding: var(--s8) 0; }
   .newsletter { padding: var(--s7) var(--s5); }
+
+  /* Prevent iOS Safari from auto-zooming when a form field is focused */
+  .field input, .field select, .field textarea,
+  .promo-input input, .newsletter-form input { font-size: 16px; }
+
+  /* Bigger tap targets on touch-width viewports */
+  .nav-toggle { padding: 10px; }
+  .cart-row .qty button { padding: 10px 14px; }
+  .cart-row .remove { padding: 10px; font-size: 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

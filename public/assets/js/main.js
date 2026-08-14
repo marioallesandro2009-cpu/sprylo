@@ -19,6 +19,16 @@
     if (e.key === 'Escape' && drawer && drawer.classList.contains('is-open')) setDrawer(false);
   });
 
+  // Shop filters toggle (collapsed by default on tablet/mobile)
+  const filtersToggle = document.querySelector('.filters-toggle');
+  const filtersForm = document.querySelector('.filters');
+  if (filtersToggle && filtersForm) {
+    filtersToggle.addEventListener('click', () => {
+      const isOpen = filtersForm.classList.toggle('is-open');
+      filtersToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+  }
+
   // Category tabs (just visual switch)
   document.querySelectorAll('.tabs').forEach((tablist) => {
     tablist.querySelectorAll('.tab').forEach((tab) => {

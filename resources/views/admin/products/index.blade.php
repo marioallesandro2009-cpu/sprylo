@@ -38,9 +38,9 @@
               <td class="fw-semibold">{{ $product->name }}</td>
               <td class="text-muted small">{{ $product->category->name }}</td>
               <td>
-                ${{ number_format($product->sale_price ?? $product->price, 2) }}
+                {{ rupiah($product->sale_price ?? $product->price) }}
                 @if($product->sale_price)
-                  <span class="text-muted text-decoration-line-through small">${{ number_format($product->price, 2) }}</span>
+                  <span class="text-muted text-decoration-line-through small">{{ rupiah($product->price) }}</span>
                 @endif
               </td>
               <td>{{ $product->stock }}</td>

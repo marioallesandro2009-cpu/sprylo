@@ -17,7 +17,7 @@ class SettingSeeder extends Seeder
             'favicon' => null,
 
             'utility_promo_tag' => 'SALE',
-            'utility_text' => 'Free shipping on orders over $50 · 30-day returns',
+            'utility_text' => 'Free shipping on orders over Rp 750.000 · 30-day returns',
             'nav_cta_prefix' => 'UP TO',
             'nav_cta_highlight' => '60% OFF',
             'nav_cta_suffix' => 'ALL ITEMS',
@@ -52,7 +52,7 @@ class SettingSeeder extends Seeder
             'utility_link1_url' => '#',
             'utility_link2_label' => 'Help',
             'utility_link2_url' => '#',
-            'utility_link3_label' => 'EN · USD',
+            'utility_link3_label' => 'ID · IDR',
             'utility_link3_url' => '#',
 
             'trust_shipping_title' => 'Free fast shipping',
@@ -70,13 +70,33 @@ class SettingSeeder extends Seeder
             'contact_livechat_label' => 'LIVE CHAT',
             'contact_livechat_status' => 'Open chat — 4 agents online',
 
+            'about_heading' => 'About Sprylo',
+            'about_body' => "We're a small team obsessed with getting good tech gear into your hands without the markup or the runaround. Every product we stock, we've tested ourselves.",
+            'about_image' => 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80&auto=format&fit=crop',
+            'history_heading' => 'Our story',
+            'history_body' => "Sprylo started in 2018 as a two-person operation shipping headphones out of a garage. Since then we've moved over 400,000 boxes, opened a flagship in San Francisco, and kept the same rule: if we wouldn't buy it ourselves, we don't sell it.",
+
             'section_hero_enabled' => '1',
             'section_trending_enabled' => '1',
             'section_discounts_enabled' => '1',
-            'section_categories_enabled' => '1',
             'section_just_for_you_enabled' => '1',
-            'section_brands_enabled' => '1',
             'section_newsletter_enabled' => '1',
+
+            'shipping_free_threshold' => '750000',
+            'shipping_fee' => '25000',
+
+            'contact_reply_sla_text' => 'Message sent — we will reply within 4 hours.',
+
+            'privacy_collect_heading' => 'Information we collect',
+            'privacy_collect_body' => "When you place an order, contact support, or sign up for our newsletter, we collect the details you provide directly — name, email, phone, and shipping address. We also collect basic usage data (pages visited, cart contents) to keep the store working correctly.",
+            'privacy_use_heading' => 'How we use it',
+            'privacy_use_body' => 'Order details are used to fulfil and ship your order and to respond to support requests. We never sell your personal data to third parties.',
+            'privacy_cookies_heading' => 'Cookies',
+            'privacy_cookies_body' => "We use a session cookie to remember what's in your cart and wishlist while you shop. It's cleared automatically and isn't used for tracking or advertising.",
+            'privacy_contact_heading' => 'Contact us',
+            'privacy_contact_body' => 'Questions about this policy or your data? Email us or use our contact form.',
+
+            'footer_credit_text' => 'Free HTML template · No framework · No build step.',
         ];
 
         Setting::where('key', 'nav_cta_text')->delete();

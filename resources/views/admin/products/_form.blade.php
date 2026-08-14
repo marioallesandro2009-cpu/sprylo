@@ -30,12 +30,12 @@
   </div>
 
   <div class="col-md-3">
-    <label class="form-label small fw-semibold">Price ($)</label>
-    <input type="number" step="0.01" min="0" name="price" class="form-control" value="{{ old('price', $product->price ?? '') }}" required />
+    <label class="form-label small fw-semibold">Price (Rp)</label>
+    <input type="number" step="1000" min="0" name="price" class="form-control" value="{{ old('price', $product->price ?? '') }}" required />
   </div>
   <div class="col-md-3">
-    <label class="form-label small fw-semibold">Sale price ($)</label>
-    <input type="number" step="0.01" min="0" name="sale_price" class="form-control" value="{{ old('sale_price', $product->sale_price ?? '') }}" />
+    <label class="form-label small fw-semibold">Sale price (Rp)</label>
+    <input type="number" step="1000" min="0" name="sale_price" class="form-control" value="{{ old('sale_price', $product->sale_price ?? '') }}" />
     <div class="form-text">Leave empty if not on sale.</div>
   </div>
   <div class="col-md-3">

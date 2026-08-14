@@ -29,13 +29,22 @@ class SiteSettingController extends Controller
         'trust_warranty_title', 'trust_warranty_subtitle',
         'trust_authentic_title', 'trust_authentic_subtitle',
         'contact_trade_heading', 'contact_trade_description', 'contact_trade_cta_label',
-        'contact_livechat_label', 'contact_livechat_status',
+        'contact_livechat_label', 'contact_livechat_status', 'contact_reply_sla_text',
+        'about_heading', 'about_body', 'about_image', 'history_heading', 'history_body',
+        'privacy_collect_heading', 'privacy_collect_body',
+        'privacy_use_heading', 'privacy_use_body',
+        'privacy_cookies_heading', 'privacy_cookies_body',
+        'privacy_contact_heading', 'privacy_contact_body',
+        'footer_credit_text',
+    ];
+
+    private const NUMERIC_KEYS = [
+        'shipping_free_threshold', 'shipping_fee',
     ];
 
     private const SECTION_KEYS = [
         'section_hero_enabled', 'section_trending_enabled', 'section_discounts_enabled',
-        'section_categories_enabled', 'section_just_for_you_enabled',
-        'section_brands_enabled', 'section_newsletter_enabled',
+        'section_just_for_you_enabled', 'section_newsletter_enabled',
     ];
 
     public function index(): View
@@ -47,11 +56,13 @@ class SiteSettingController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
-        $data = $request->validate(
-            collect(self::TEXT_KEYS)->mapWithKeys(fn ($key) => [$key => ['nullable', 'string']])->all()
-        );
+        $rules = collect(self::TEXT_KEYS)->mapWithKeys(fn ($key) => [$key => ['nullable', 'string']])
+            ->merge(collect(self::NUMERIC_KEYS)->mapWithKeys(fn ($key) => [$key => ['nullable', 'numeric', 'min:0']]))
+            ->all();
 
-        foreach (self::TEXT_KEYS as $key) {
+        $data = $request->validate($rules);
+
+        foreach ([...self::TEXT_KEYS, ...self::NUMERIC_KEYS] as $key) {
             Setting::updateOrCreate(['key' => $key], ['value' => $data[$key] ?? null]);
         }
 

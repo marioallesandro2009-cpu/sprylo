@@ -1,6 +1,9 @@
 @php
   $siteName = $settings['site_name'] ?? 'Sprylo';
 @endphp
+@if(($settings['section_newsletter_enabled'] ?? '1') !== '0')
+  @include('partials.newsletter')
+@endif
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -42,7 +45,9 @@
     </div>
     <div class="footer-bottom">
       <span>{{ $settings['footer_copyright'] ?? '© '.date('Y').' Sprylo · All rights reserved' }}</span>
-      <span>Free HTML template · No framework · No build step. Distributed by <a href="https://themewagon.com/" target="_blank">ThemeWagon</a></span>
+      @if(!empty($settings['footer_credit_text']))
+        <span>{{ $settings['footer_credit_text'] }}</span>
+      @endif
     </div>
   </div>
 </footer>

@@ -8,15 +8,25 @@
     @if($product->badge)
       <span class="badge @if($product->badge === 'Sale') badge--sale @endif">{{ $product->badge }}</span>
     @endif
-    <button class="wishlist" aria-label="Wishlist">♡</button>
+    @if(in_array($product->id, $wishlistIds ?? []))
+      <form action="{{ route('wishlist.remove', $product) }}" method="POST" style="display:contents">
+        @csrf @method('DELETE')
+        <button type="submit" class="wishlist is-active" aria-label="Remove from wishlist">♥</button>
+      </form>
+    @else
+      <form action="{{ route('wishlist.add', $product) }}" method="POST" style="display:contents">
+        @csrf
+        <button type="submit" class="wishlist" aria-label="Add to wishlist">♡</button>
+      </form>
+    @endif
     <img src="{{ $image }}" alt="{{ $product->name }}" />
   </div>
   <div class="stock"><span class="dot"></span>In stock · {{ $product->stock }} items</div>
   <a href="{{ route('product.show', $product) }}" class="name">{{ $product->name }}</a>
   <div class="price">
-    <span class="now">${{ number_format($displayPrice, 0) }}</span>
+    <span class="now">{{ rupiah($displayPrice) }}</span>
     @if($product->sale_price)
-      <span class="was">${{ number_format($product->price, 0) }}</span>
+      <span class="was">{{ rupiah($product->price) }}</span>
     @endif
   </div>
   <div class="stars">{{ str_repeat('★', $rating) }}{{ str_repeat('☆', 5 - $rating) }} <span class="count">({{ $product->reviews_count }})</span></div>
