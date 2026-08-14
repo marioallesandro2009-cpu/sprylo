@@ -9,8 +9,10 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\FooterLinkController;
 use App\Http\Controllers\Admin\HeroHighlightController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use Illuminate\Support\Facades\Route;
@@ -18,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:10,1');
 
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
@@ -41,6 +43,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('hero-highlights', [HeroHighlightController::class, 'update'])->name('hero-highlights.update');
 
         Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
+        Route::resource('promo-codes', PromoCodeController::class)->except(['show']);
+        Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
 
         Route::get('settings', [SiteSettingController::class, 'index'])->name('settings.index');
         Route::put('settings', [SiteSettingController::class, 'update'])->name('settings.update');
