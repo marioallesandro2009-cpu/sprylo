@@ -313,10 +313,14 @@ input, select, textarea { font: inherit; color: inherit; }
   padding: var(--s7) 0 var(--s8);
   background: var(--paper);
 }
+/* Auto-flow "dense" bento grid: any number of large/small hero slides packs
+   itself into the 3-column grid without needing a fixed slot per card, so
+   admins can add or remove slides freely from Admin → Hero Slides. */
 .bento {
   display: grid;
-  grid-template-columns: 2.2fr 1fr;
-  grid-template-rows: 1fr 1fr auto;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 260px;
+  grid-auto-flow: dense;
   gap: var(--s4);
 }
 .bento-card {
@@ -328,7 +332,6 @@ input, select, textarea { font: inherit; color: inherit; }
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 280px;
   transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
 }
 .bento-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
@@ -339,12 +342,20 @@ input, select, textarea { font: inherit; color: inherit; }
   opacity: 0.82;
   position: relative; z-index: 2;
 }
-.bento-card h2, .bento-card h3, .bento-card p, .bento-card .shop-now, .bento-card .btn {
-  position: relative; z-index: 2;
+.bento-card-body {
+  position: relative;
+  z-index: 2;
+  /* Reserve room for the absolutely positioned product image at every
+     width down to the stacked mobile layout, so text can never grow into
+     the image's corner — regardless of how long the heading text is. */
+  max-width: 64%;
 }
 .bento-card h2, .bento-card h3 {
   color: inherit;
   margin: var(--s3) 0 var(--s4);
+  overflow-wrap: break-word;
+  word-break: normal;
+  white-space: normal;
 }
 .bento-card p {
   font-size: var(--text-sm);
@@ -364,6 +375,7 @@ input, select, textarea { font: inherit; color: inherit; }
 .bento-card .shop-now:hover { gap: 14px; }
 .bento-card img.product {
   position: absolute;
+  right: 0; bottom: 0;
   pointer-events: none;
   filter: drop-shadow(0 20px 30px rgba(0,0,0,0.35));
 }
@@ -375,95 +387,75 @@ input, select, textarea { font: inherit; color: inherit; }
   pointer-events: none;
 }
 
-.bento-card--lg {
-  grid-row: 1 / span 2;
-  grid-column: 1;
-  background: linear-gradient(135deg, var(--card-blue), var(--card-blue-2));
-  color: var(--paper);
-  min-height: 540px;
+.bento-card--size-large {
+  grid-column: span 2;
+  grid-row: span 2;
   padding: var(--s8);
 }
-.bento-card--lg > div {
-  position: relative;
-  z-index: 2;
-  max-width: 50%;
-}
-.bento-card--lg h2 {
+.bento-card--size-large .bento-card-body { max-width: 50%; }
+.bento-card--size-large h2 {
   font-size: clamp(1.75rem, 1rem + 2vw, 2.75rem);
   line-height: 1.04;
   letter-spacing: -0.025em;
   font-weight: 800;
   max-width: 14ch;
 }
-.bento-card--lg p { max-width: 32ch; font-size: var(--text-sm); }
-.bento-card--lg img.product {
-  right: -30px; bottom: -20px; top: auto; transform: none;
-  width: 50%; max-width: 440px;
+.bento-card--size-large p { max-width: 32ch; font-size: var(--text-sm); }
+.bento-card--size-large img.product {
+  right: -30px; bottom: -20px;
+  width: 45%; max-width: 440px;
   filter: drop-shadow(0 30px 50px rgba(0,0,0,0.45));
 }
-.bento-card--lg .dots {
-  display: inline-flex; gap: 6px;
-  margin-top: var(--s4);
-}
-.bento-card--lg .dots span {
-  width: 22px; height: 4px; border-radius: 999px;
-  background: rgba(255,255,255,0.3);
-}
-.bento-card--lg .dots span.active { background: var(--paper); width: 28px; }
 
-.bento-card--purple {
-  background: linear-gradient(135deg, var(--card-purple) 0%, var(--card-purple-2) 70%, #9333EA 100%);
-  color: var(--paper);
-  grid-column: 2;
-  grid-row: 1;
-  min-height: 260px;
+.bento-card--size-small { grid-column: span 1; grid-row: span 1; }
+.bento-card--size-small h3 {
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  /* Backstop for unusually long product names: wrap up to 2 lines, then
+     ellipsis instead of letting the card's overflow:hidden clip mid-word. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.bento-card--purple img.product {
-  right: -10px; bottom: -10px; width: 60%; max-width: 200px;
+.bento-card--size-small img.product { width: 55%; max-width: 200px; }
+
+@media (max-width: 960px) {
+  .bento { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
+  .bento-card--size-large, .bento-card--size-small { grid-column: span 1; grid-row: span 1; }
+
+  /* Single-column cards are as narrow as the phone screen, so the absolutely
+     positioned product image no longer has room beside the text without
+     covering the heading/CTA — stack image under text instead. */
+  .bento-card { flex-direction: column; align-items: stretch; padding: var(--s6); }
+  .bento-card--size-large .bento-card-body,
+  .bento-card--size-small .bento-card-body { max-width: 100%; }
+  .bento-card img.product {
+    position: static;
+    align-self: center;
+    margin: var(--s5) 0 0;
+    filter: drop-shadow(0 12px 20px rgba(0,0,0,0.35));
+  }
+  .bento-card--size-large img.product { width: 55%; max-width: 220px; }
+  .bento-card--size-small img.product { width: 40%; max-width: 160px; }
+  .bento-card--size-small h3 { font-size: var(--text-base); }
 }
 
-.bento-card--teal {
-  background: linear-gradient(135deg, #0E7490 0%, #0891B2 60%, #06B6D4 100%);
-  color: var(--paper);
-  grid-column: 2;
-  grid-row: 2;
-  min-height: 260px;
-}
-.bento-card--teal img.product {
-  right: -10px; bottom: -10px; width: 62%; max-width: 220px;
-}
-
-.bento-row {
-  grid-column: 1 / -1;
-  grid-row: 3;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s4);
-}
-.bento-card--orange {
-  background: linear-gradient(135deg, var(--card-orange), var(--card-orange-2));
-  color: var(--paper);
-  min-height: 240px;
-}
-.bento-card--orange img.product {
-  right: 0; bottom: 0; width: 55%; max-width: 180px;
-}
-.bento-card--green {
-  background: linear-gradient(135deg, var(--card-green), var(--card-green-2));
-  color: var(--paper);
-  min-height: 240px;
-}
-.bento-card--green img.product {
-  right: 0; bottom: 0; width: 56%; max-width: 200px;
-}
-.bento-card--black {
-  background: linear-gradient(135deg, var(--card-black), #1F1F1F);
-  color: var(--paper);
-  min-height: 240px;
-}
-.bento-card--black img.product {
-  right: 0; bottom: 0; width: 50%; max-width: 180px;
-}
+/* Shared color palette for hero slides (.bento-card) and promo/discount
+   banners (.discount-card) — picked per-item from Admin, not tied to a
+   fixed position, so any card can use any theme. Keep keys in sync with
+   App\Support\PromoTheme::OPTIONS. */
+.theme-indigo { background: linear-gradient(135deg, var(--card-blue), var(--card-blue-2)); color: var(--paper); }
+.theme-violet { background: linear-gradient(135deg, var(--card-purple) 0%, var(--card-purple-2) 70%, #9333EA 100%); color: var(--paper); }
+.theme-teal   { background: linear-gradient(135deg, #0E7490 0%, #0891B2 60%, #06B6D4 100%); color: var(--paper); }
+.theme-orange { background: linear-gradient(135deg, var(--card-orange), var(--card-orange-2)); color: var(--paper); }
+.theme-green  { background: linear-gradient(135deg, var(--card-green), var(--card-green-2)); color: var(--paper); }
+.theme-slate  { background: linear-gradient(135deg, #0F172A, #1E293B); color: var(--paper); }
+.theme-rose   { background: linear-gradient(135deg, #BE123C, #E11D48); color: var(--paper); }
 
 /* ---------- Section base ---------- */
 .section {
@@ -613,10 +605,10 @@ input, select, textarea { font: inherit; color: inherit; }
 }
 .product-card .btn:hover { background: var(--indigo); color: var(--paper); }
 
-/* ---------- Discount banner (2-up) ---------- */
+/* ---------- Discount / promo banners (any count from Admin → Promo Banners) ---------- */
 .discount-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--s4);
 }
 .discount-card {
@@ -628,23 +620,38 @@ input, select, textarea { font: inherit; color: inherit; }
   overflow: hidden;
   color: var(--paper);
 }
-.discount-card--watch {
-  background: linear-gradient(135deg, #0F172A, #1E293B);
-}
-.discount-card--airpods {
-  background: linear-gradient(135deg, #7C3AED, #A855F7);
+.discount-card-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  /* Reserve room for the absolutely positioned product image at every
+     width down to the stacked mobile layout, so a long product name or
+     the "% Off" badge can never grow into the image's corner. */
+  max-width: 58%;
 }
 .discount-card h3 {
   color: inherit;
   font-size: var(--text-2xl);
   line-height: 1.1;
   margin-bottom: var(--s2);
+  overflow-wrap: break-word;
+  word-break: normal;
+  white-space: normal;
+  /* Backstop for unusually long product names: wrap up to 3 lines, then
+     ellipsis instead of letting the card's overflow:hidden clip mid-word. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .discount-card h3 .pct {
   display: block;
   font-size: var(--text-3xl);
   color: var(--amber);
   font-weight: 800;
+  white-space: normal;
 }
 .discount-card .meta {
   font-family: var(--ff-mono); font-size: var(--text-xs);
@@ -1293,15 +1300,8 @@ input, select, textarea { font: inherit; color: inherit; }
   .filters-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
 }
 @media (max-width: 960px) {
-  .bento { grid-template-columns: 1fr; grid-template-rows: auto; }
-  .bento-card--lg { grid-row: auto; grid-column: 1; min-height: 420px; }
-  .bento-card--lg img.product { width: 70%; max-width: 360px; }
-  .bento-card--purple { grid-column: 1; grid-row: auto; }
-  .bento-card--teal { grid-column: 1; grid-row: auto; }
-  .bento-row { grid-column: 1; grid-row: auto; }
   .products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .cats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .discount-row { grid-template-columns: minmax(0, 1fr); }
   .product-detail { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
   .specs-reviews { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
   .cart-layout { grid-template-columns: minmax(0, 1fr); }
@@ -1340,6 +1340,27 @@ input, select, textarea { font: inherit; color: inherit; }
   .nav-toggle { padding: 10px; }
   .cart-row .qty button { padding: 10px 14px; }
   .cart-row .remove { padding: 10px; font-size: 20px; }
+}
+
+@media (max-width: 480px) {
+  /* Discount/promo banners: the product image is absolutely positioned over
+     the text at larger widths, which only works because the row is 2-up
+     with room to spare. On phones there isn't room for that trick, so stack
+     the image under the text instead of letting it cover the title/badge/CTA. */
+  .discount-card {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    padding: var(--s6);
+  }
+  .discount-card-body { max-width: 100%; }
+  .discount-card img.product {
+    position: static;
+    align-self: center;
+    margin: var(--s5) 0 0;
+    width: 42%; max-width: 180px;
+    filter: drop-shadow(0 12px 20px rgba(0,0,0,0.35));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

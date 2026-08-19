@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\HeroHighlight;
+use App\Models\HeroSlide;
 use App\Models\PageMeta;
 use App\Models\Product;
+use App\Models\PromoBanner;
 
 class HomeController extends Controller
 {
@@ -12,7 +13,10 @@ class HomeController extends Controller
     {
         $pageMeta = PageMeta::forPage('home');
 
-        $heroHighlights = HeroHighlight::with('product')->get()->keyBy('position');
+        $heroSlides = HeroSlide::with('product')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
 
         $trendingProducts = Product::withRatingStats()
             ->with('images')
@@ -21,11 +25,9 @@ class HomeController extends Controller
             ->take(5)
             ->get();
 
-        $discountBanners = Product::withRatingStats()
-            ->with('images')
+        $promoBanners = PromoBanner::with(['product.images'])
             ->where('is_active', true)
-            ->whereNotNull('sale_price')
-            ->take(2)
+            ->orderBy('sort_order')
             ->get();
 
         $justForYou = Product::withRatingStats()
@@ -36,7 +38,7 @@ class HomeController extends Controller
             ->get();
 
         return view('pages.home', compact(
-            'pageMeta', 'heroHighlights', 'trendingProducts', 'discountBanners', 'justForYou'
+            'pageMeta', 'heroSlides', 'trendingProducts', 'promoBanners', 'justForYou'
         ));
     }
 }

@@ -122,32 +122,12 @@
     </div>
 
     <div class="card-admin mb-3">
-      <h6 class="fw-bold mb-3">Homepage Hero Banner</h6>
+      <h6 class="fw-bold mb-3">Navigation</h6>
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label small fw-semibold">Eyebrow label</label>
-          <input type="text" name="hero_eyebrow" class="form-control" value="{{ old('hero_eyebrow', $settings['hero_eyebrow'] ?? '') }}" />
-        </div>
-        <div class="col-md-6">
-          <label class="form-label small fw-semibold">CTA button label</label>
-          <input type="text" name="hero_cta_label" class="form-control" value="{{ old('hero_cta_label', $settings['hero_cta_label'] ?? '') }}" />
-        </div>
-        <div class="col-12">
-          <label class="form-label small fw-semibold">Heading</label>
-          <input type="text" name="hero_heading" class="form-control" value="{{ old('hero_heading', $settings['hero_heading'] ?? '') }}" />
-        </div>
-        <div class="col-12">
-          <label class="form-label small fw-semibold">Description</label>
-          <textarea name="hero_description" rows="2" class="form-control">{{ old('hero_description', $settings['hero_description'] ?? '') }}</textarea>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label small fw-semibold">Image URL</label>
-          <input type="text" name="hero_image" class="form-control" value="{{ old('hero_image', $settings['hero_image'] ?? '') }}" />
-        </div>
-        <div class="col-md-6">
-          <label class="form-label small fw-semibold">Linked product slug</label>
+          <label class="form-label small fw-semibold">Featured product slug</label>
           <input type="text" name="hero_product_slug" class="form-control" value="{{ old('hero_product_slug', $settings['hero_product_slug'] ?? '') }}" />
-          <div class="form-text">Also used by the "Products" nav link.</div>
+          <div class="form-text">Used by the "Products" nav link. The homepage hero banner cards themselves are managed under <a href="{{ route('admin.hero-slides.index') }}">Hero Slides</a>.</div>
         </div>
       </div>
     </div>

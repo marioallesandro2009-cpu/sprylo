@@ -81,7 +81,8 @@
       </a>
       <a href="{{ route('admin.faqs.index') }}" class="admin-nav-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}"><i class="fa-solid fa-circle-question"></i> FAQs</a>
       <a href="{{ route('admin.footer-links.index') }}" class="admin-nav-link {{ request()->routeIs('admin.footer-links.*') ? 'active' : '' }}"><i class="fa-solid fa-link"></i> Footer Links</a>
-      <a href="{{ route('admin.hero-highlights.index') }}" class="admin-nav-link {{ request()->routeIs('admin.hero-highlights.*') ? 'active' : '' }}"><i class="fa-solid fa-images"></i> Hero Highlights</a>
+      <a href="{{ route('admin.hero-slides.index') }}" class="admin-nav-link {{ request()->routeIs('admin.hero-slides.*') ? 'active' : '' }}"><i class="fa-solid fa-images"></i> Hero Slides</a>
+      <a href="{{ route('admin.promo-banners.index') }}" class="admin-nav-link {{ request()->routeIs('admin.promo-banners.*') ? 'active' : '' }}"><i class="fa-solid fa-tag"></i> Promo Banners</a>
 
       <div class="admin-nav-section">Configuration</div>
       <a href="{{ route('admin.settings.index') }}" class="admin-nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"><i class="fa-solid fa-gear"></i> Site Settings</a>

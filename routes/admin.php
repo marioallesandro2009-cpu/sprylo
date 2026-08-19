@@ -8,10 +8,11 @@ use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\FooterLinkController;
-use App\Http\Controllers\Admin\HeroHighlightController;
+use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Admin\PromoBannerController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SiteSettingController;
@@ -39,8 +40,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('faqs', FaqController::class)->except(['show']);
         Route::resource('footer-links', FooterLinkController::class)->except(['show']);
 
-        Route::get('hero-highlights', [HeroHighlightController::class, 'index'])->name('hero-highlights.index');
-        Route::put('hero-highlights', [HeroHighlightController::class, 'update'])->name('hero-highlights.update');
+        Route::resource('hero-slides', HeroSlideController::class)->except(['show']);
+        Route::resource('promo-banners', PromoBannerController::class)->except(['show']);
 
         Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
         Route::resource('promo-codes', PromoCodeController::class)->except(['show']);

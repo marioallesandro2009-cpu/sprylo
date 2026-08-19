@@ -36,11 +36,6 @@ class SettingSeeder extends Seeder
             'footer_about_text' => "Modern tech & gadgets — straight from the makers, shipped fast, supported well. Since 2018, we've moved over 400,000 boxes.",
             'footer_copyright' => '© '.date('Y').' Sprylo · All rights reserved',
 
-            'hero_eyebrow' => '⚡ Audio · Featured',
-            'hero_heading' => 'Apple HomePod 2nd Gen Speaker',
-            'hero_description' => 'Apple ecosystem with high-quality audio playback while serving as a hub for controlling smart home devices. Spatial audio, room-sensing tech.',
-            'hero_cta_label' => 'Shop Now',
-            'hero_image' => 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=900&q=80&auto=format&fit=crop',
             'hero_product_slug' => 'apple-homepod-2nd-gen',
 
             'newsletter_prefix' => 'Get',
