@@ -326,12 +326,15 @@ input, select, textarea { font: inherit; color: inherit; }
 .bento-card {
   position: relative;
   border-radius: var(--r-lg);
-  padding: var(--s7);
   overflow: hidden;
   isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  /* Two explicit columns — text left, image right — instead of a small
+     image absolutely positioned in the corner. This scales to any card
+     size without leaving unused space or the image overlapping text. */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  align-items: stretch;
   transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
 }
 .bento-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
@@ -345,10 +348,11 @@ input, select, textarea { font: inherit; color: inherit; }
 .bento-card-body {
   position: relative;
   z-index: 2;
-  /* Reserve room for the absolutely positioned product image at every
-     width down to the stacked mobile layout, so text can never grow into
-     the image's corner — regardless of how long the heading text is. */
-  max-width: 64%;
+  min-width: 0;
+  padding: var(--s7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .bento-card h2, .bento-card h3 {
   color: inherit;
@@ -373,11 +377,16 @@ input, select, textarea { font: inherit; color: inherit; }
   transition: gap 180ms var(--ease);
 }
 .bento-card .shop-now:hover { gap: 14px; }
+/* Product image is its own grid column now, not an absolutely positioned
+   corner cutout — it fills the full height/width of its half of the card
+   at every card size, so there's no leftover empty space next to it. */
 .bento-card img.product {
-  position: absolute;
-  right: 0; bottom: 0;
-  pointer-events: none;
-  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.35));
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: cover;
+  display: block;
 }
 .bento-card .sparkle {
   position: absolute; inset: 0;
@@ -390,9 +399,9 @@ input, select, textarea { font: inherit; color: inherit; }
 .bento-card--size-large {
   grid-column: span 2;
   grid-row: span 2;
-  padding: var(--s8);
+  grid-template-columns: 6fr 5fr;
 }
-.bento-card--size-large .bento-card-body { max-width: 50%; }
+.bento-card--size-large .bento-card-body { padding: var(--s8); }
 .bento-card--size-large h2 {
   font-size: clamp(1.75rem, 1rem + 2vw, 2.75rem);
   line-height: 1.04;
@@ -401,13 +410,15 @@ input, select, textarea { font: inherit; color: inherit; }
   max-width: 14ch;
 }
 .bento-card--size-large p { max-width: 32ch; font-size: var(--text-sm); }
-.bento-card--size-large img.product {
-  right: -30px; bottom: -20px;
-  width: 45%; max-width: 440px;
-  filter: drop-shadow(0 30px 50px rgba(0,0,0,0.45));
-}
 
-.bento-card--size-small { grid-column: span 1; grid-row: span 1; }
+.bento-card--size-small {
+  grid-column: span 1;
+  grid-row: span 1;
+  /* Small cards are compact, so give text a bit more than half the width —
+     50/50 with the default s7 padding left almost no room for a heading. */
+  grid-template-columns: 3fr 2fr;
+}
+.bento-card--size-small .bento-card-body { padding: var(--s6); }
 .bento-card--size-small h3 {
   font-size: var(--text-lg);
   line-height: 1.2;
@@ -419,7 +430,6 @@ input, select, textarea { font: inherit; color: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.bento-card--size-small img.product { width: 55%; max-width: 200px; }
 
 @media (max-width: 960px) {
   .bento { grid-template-columns: repeat(2, 1fr); }
@@ -428,20 +438,21 @@ input, select, textarea { font: inherit; color: inherit; }
   .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
   .bento-card--size-large, .bento-card--size-small { grid-column: span 1; grid-row: span 1; }
 
-  /* Single-column cards are as narrow as the phone screen, so the absolutely
-     positioned product image no longer has room beside the text without
-     covering the heading/CTA — stack image under text instead. */
-  .bento-card { flex-direction: column; align-items: stretch; padding: var(--s6); }
-  .bento-card--size-large .bento-card-body,
-  .bento-card--size-small .bento-card-body { max-width: 100%; }
-  .bento-card img.product {
-    position: static;
-    align-self: center;
-    margin: var(--s5) 0 0;
-    filter: drop-shadow(0 12px 20px rgba(0,0,0,0.35));
+  /* Single-column cards are as narrow as the phone screen, so there's no
+     room for a side-by-side grid — stack the image above the text instead. */
+  .bento-card,
+  .bento-card--size-large {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
   }
-  .bento-card--size-large img.product { width: 55%; max-width: 220px; }
-  .bento-card--size-small img.product { width: 40%; max-width: 160px; }
+  .bento-card img.product {
+    order: -1;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  .bento-card-body,
+  .bento-card--size-large .bento-card-body { padding: var(--s6); }
   .bento-card--size-small h3 { font-size: var(--text-base); }
 }
 
@@ -614,21 +625,25 @@ input, select, textarea { font: inherit; color: inherit; }
 .discount-card {
   position: relative;
   border-radius: var(--r-lg);
-  padding: var(--s7);
-  min-height: 260px;
-  display: flex; flex-direction: column; justify-content: center;
   overflow: hidden;
+  /* Two explicit columns — text left, image right — instead of a small
+     image absolutely positioned in the corner. Text gets a bit more than
+     half the width so the heading/CTA aren't cramped against the padding. */
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 1fr;
+  align-items: stretch;
+  min-height: 260px;
   color: var(--paper);
 }
 .discount-card-body {
   position: relative;
   z-index: 2;
+  min-width: 0;
+  padding: var(--s6);
   display: flex;
   flex-direction: column;
-  /* Reserve room for the absolutely positioned product image at every
-     width down to the stacked mobile layout, so a long product name or
-     the "% Off" badge can never grow into the image's corner. */
-  max-width: 58%;
+  justify-content: center;
 }
 .discount-card h3 {
   color: inherit;
@@ -658,11 +673,15 @@ input, select, textarea { font: inherit; color: inherit; }
   letter-spacing: 0.08em; opacity: 0.7; margin-bottom: var(--s5);
 }
 .discount-card .shop-now { color: var(--paper); align-self: flex-start; }
+/* Product image is its own grid column now, not an absolutely positioned
+   corner cutout — it fills the full height/width of its half of the card. */
 .discount-card img.product {
-  position: absolute;
-  right: -10px; bottom: -10px;
-  width: 50%; max-width: 240px;
-  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: cover;
+  display: block;
 }
 
 /* ---------- Categories grid (round tiles) ---------- */
@@ -1342,25 +1361,21 @@ input, select, textarea { font: inherit; color: inherit; }
   .cart-row .remove { padding: 10px; font-size: 20px; }
 }
 
-@media (max-width: 480px) {
-  /* Discount/promo banners: the product image is absolutely positioned over
-     the text at larger widths, which only works because the row is 2-up
-     with room to spare. On phones there isn't room for that trick, so stack
-     the image under the text instead of letting it cover the title/badge/CTA. */
+@media (max-width: 640px) {
+  /* Discount/promo banners: stack the image above the text instead of a
+     side-by-side grid — there's no room for two columns at phone widths. */
   .discount-card {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
     min-height: 0;
-    padding: var(--s6);
   }
-  .discount-card-body { max-width: 100%; }
   .discount-card img.product {
-    position: static;
-    align-self: center;
-    margin: var(--s5) 0 0;
-    width: 42%; max-width: 180px;
-    filter: drop-shadow(0 12px 20px rgba(0,0,0,0.35));
+    order: -1;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
   }
+  .discount-card-body { padding: var(--s6); }
 }
 
 @media (prefers-reduced-motion: reduce) {
