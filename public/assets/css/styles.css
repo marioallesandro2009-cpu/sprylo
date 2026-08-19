@@ -1107,7 +1107,7 @@ input, select, textarea { font: inherit; color: inherit; }
   margin-bottom: var(--s3);
 }
 .pdp-info .rating-row {
-  display: inline-flex; gap: var(--s3); align-items: center;
+  display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); align-items: center;
   font-size: var(--text-sm);
   color: var(--fg-mute);
   margin-bottom: var(--s4);

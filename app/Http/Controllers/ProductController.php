@@ -19,6 +19,7 @@ class ProductController extends Controller
             ['label' => 'Brand', 'value' => $product->brand->name ?? '—'],
             ['label' => 'Price', 'value' => rupiah($product->price)],
             ['label' => 'Stock', 'value' => $product->stock.' units'],
+            ['label' => 'Weight', 'value' => weight_label($product->weight)],
             ['label' => 'Rating', 'value' => $product->reviews_count > 0
                 ? $product->rating_avg.' / 5 ('.$product->reviews_count.' reviews)'
                 : 'No reviews yet'],

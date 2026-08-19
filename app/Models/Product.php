@@ -14,12 +14,13 @@ class Product extends Model
 
     protected $fillable = [
         'category_id', 'brand_id', 'name', 'slug', 'description',
-        'price', 'sale_price', 'stock', 'is_active',
+        'price', 'sale_price', 'stock', 'weight', 'is_active',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
+        'weight' => 'integer',
         'is_active' => 'boolean',
     ];
 

@@ -8,6 +8,8 @@
     <span style="color: var(--emerald); display:inline-flex; align-items:center; gap:6px"><span
         style="width:6px;height:6px;background:var(--emerald);border-radius:999px;display:inline-block"></span>
       In stock · {{ $product->stock }} items</span>
+    <span style="color: var(--rule-strong)">|</span>
+    <span style="color: var(--fg-mute)">Weight: {{ weight_label($product->weight) }}</span>
   </div>
   <p class="desc">{{ $product->description }}</p>
 

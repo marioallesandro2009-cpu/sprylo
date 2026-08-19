@@ -96,6 +96,7 @@ class ProductController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'stock' => ['required', 'integer', 'min:0'],
+            'weight' => ['required', 'integer', 'min:0'],
             'images.*' => ['nullable', 'image', 'max:4096'],
         ]);
     }

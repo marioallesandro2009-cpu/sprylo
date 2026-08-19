@@ -43,6 +43,11 @@
     <input type="number" min="0" name="stock" class="form-control" value="{{ old('stock', $product->stock ?? 0) }}" required />
   </div>
   <div class="col-md-3">
+    <label class="form-label small fw-semibold">Weight (gram)</label>
+    <input type="number" min="0" name="weight" class="form-control" value="{{ old('weight', $product->weight ?? 0) }}" required />
+    <div class="form-text">Shown to customers on the product page.</div>
+  </div>
+  <div class="col-md-3">
     <label class="form-label small fw-semibold">Status</label>
     <div class="form-check form-switch mt-2">
       <input type="checkbox" name="is_active" value="1" class="form-check-input" id="is_active" @checked(old('is_active', $product->is_active ?? true)) />
