@@ -9,7 +9,7 @@
       <a href="{{ route('shop.index') }}" @if(request()->routeIs('shop.index')) aria-current="page" @endif>Shop ▾</a>
       <a href="{{ route('categories.index') }}" @if(request()->routeIs('categories.index')) aria-current="page" @endif>Categories</a>
       <a href="{{ route('brands.index') }}" @if(request()->routeIs('brands.index')) aria-current="page" @endif>Brands</a>
-      <a href="{{ route('product.show', $settings['hero_product_slug'] ?? 'apple-homepod-2nd-gen') }}" @if(request()->routeIs('product.show')) aria-current="page" @endif>Products</a>
+      <a href="{{ route('shop.index') }}" @if(request()->routeIs('shop.index')) aria-current="page" @endif>Products</a>
       <a href="{{ route('about.index') }}" @if(request()->routeIs('about.index')) aria-current="page" @endif>About</a>
       <a href="{{ route('cart.index') }}" @if(request()->routeIs('cart.index')) aria-current="page" @endif>Cart</a>
       <a href="{{ route('contact.index') }}" @if(request()->routeIs('contact.index')) aria-current="page" @endif>Contact</a>

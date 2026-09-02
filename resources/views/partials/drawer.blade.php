@@ -17,7 +17,7 @@
   <a href="{{ route('shop.index') }}">Shop</a>
   <a href="{{ route('categories.index') }}">Categories</a>
   <a href="{{ route('brands.index') }}">Brands</a>
-  <a href="{{ route('product.show', $settings['hero_product_slug'] ?? 'apple-homepod-2nd-gen') }}">Products</a>
+  <a href="{{ route('shop.index') }}">Products</a>
   <a href="{{ route('about.index') }}">About</a>
   <a href="{{ route('wishlist.index') }}">Wishlist</a>
   <a href="{{ route('cart.index') }}">Cart</a>
