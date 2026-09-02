@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'biteship' => [
+        'key' => env('BITESHIP_API_KEY', ''),
+        'base_url' => env('BITESHIP_BASE_URL', 'https://api.biteship.com/v1'),
+        'couriers' => env('BITESHIP_COURIERS', 'jne,jnt,sicepat,anteraja,gojek,grab'),
+        'origin' => [
+            'latitude' => (float) env('BITESHIP_ORIGIN_LATITUDE', -6.2088),
+            'longitude' => (float) env('BITESHIP_ORIGIN_LONGITUDE', 106.8456),
+        ],
+    ],
+
 ];

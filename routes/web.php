@@ -30,6 +30,7 @@ Route::post('/cart-promo', [CartController::class, 'applyPromo'])->middleware('t
 Route::delete('/cart-promo', [CartController::class, 'removePromo'])->name('cart.promo.remove');
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/checkout/rates', [CheckoutController::class, 'rates'])->middleware('throttle:20,1')->name('checkout.rates');
 Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('throttle:10,1')->name('checkout.store');
 Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
 

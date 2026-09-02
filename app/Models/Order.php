@@ -10,10 +10,15 @@ class Order extends Model
 {
     protected $fillable = [
         'order_number', 'name', 'email', 'phone', 'address', 'city', 'postal_code', 'notes',
+        'latitude', 'longitude',
+        'courier_code', 'courier_service_code', 'courier_name', 'courier_service_name', 'shipping_duration',
         'subtotal', 'shipping', 'tax', 'promo_code', 'promo_discount', 'total', 'status',
+        'payment_method', 'payment_proof_path',
     ];
 
     protected $casts = [
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
         'subtotal' => 'decimal:2',
         'shipping' => 'decimal:2',
         'tax' => 'decimal:2',

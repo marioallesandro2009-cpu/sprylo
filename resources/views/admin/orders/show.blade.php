@@ -38,6 +38,33 @@
       <div class="col-12">
         <div class="text-muted small">Shipping address</div>
         <div class="fw-semibold">{{ $order->address }}, {{ $order->city }} {{ $order->postal_code }}</div>
+        @if($order->latitude && $order->longitude)
+          <div class="text-muted small">
+            <a href="https://www.openstreetmap.org/?mlat={{ $order->latitude }}&mlon={{ $order->longitude }}#map=16/{{ $order->latitude }}/{{ $order->longitude }}" target="_blank" rel="noopener">
+              View pinned location ({{ $order->latitude }}, {{ $order->longitude }})
+            </a>
+          </div>
+        @endif
+      </div>
+      <div class="col-md-6">
+        <div class="text-muted small">Courier</div>
+        <div class="fw-semibold">
+          @if($order->courier_name)
+            {{ $order->courier_name }} — {{ $order->courier_service_name }}
+            @if($order->shipping_duration) <span class="text-muted">({{ $order->shipping_duration }})</span> @endif
+          @else
+            —
+          @endif
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="text-muted small">Payment method</div>
+        <div class="fw-semibold text-capitalize">
+          {{ $order->payment_method ? str_replace('_', ' ', $order->payment_method) : '—' }}
+          @if($order->payment_proof_path)
+            · <a href="{{ $order->payment_proof_path }}" target="_blank" rel="noopener">view proof</a>
+          @endif
+        </div>
       </div>
       @if($order->notes)
         <div class="col-12">

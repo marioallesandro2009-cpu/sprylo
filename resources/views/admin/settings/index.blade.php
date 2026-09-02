@@ -309,6 +309,33 @@
       </div>
     </div>
 
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Payment</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Bank name</label>
+          <input type="text" name="payment_bank_name" class="form-control" placeholder="BCA"
+                 value="{{ old('payment_bank_name', $settings['payment_bank_name'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Account number</label>
+          <input type="text" name="payment_bank_account_number" class="form-control" placeholder="1234567890"
+                 value="{{ old('payment_bank_account_number', $settings['payment_bank_account_number'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Account holder</label>
+          <input type="text" name="payment_bank_account_holder" class="form-control" placeholder="PT Sprylo Indonesia"
+                 value="{{ old('payment_bank_account_holder', $settings['payment_bank_account_holder'] ?? '') }}" />
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">QRIS image URL</label>
+          <input type="text" name="payment_qris_image" class="form-control" placeholder="/storage/payment/qris.png"
+                 value="{{ old('payment_qris_image', $settings['payment_qris_image'] ?? '') }}" />
+          <div class="form-text">Static QRIS image shown at checkout. Upload the image file yourself and paste its URL here — no dynamic/per-transaction QRIS is generated.</div>
+        </div>
+      </div>
+    </div>
+
     <button type="submit" class="btn btn-admin-primary">Save Settings</button>
   </form>
 

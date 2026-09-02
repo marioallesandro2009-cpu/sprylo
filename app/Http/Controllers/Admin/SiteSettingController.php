@@ -35,6 +35,8 @@ class SiteSettingController extends Controller
         'privacy_cookies_heading', 'privacy_cookies_body',
         'privacy_contact_heading', 'privacy_contact_body',
         'footer_credit_text',
+        'payment_bank_name', 'payment_bank_account_number', 'payment_bank_account_holder',
+        'payment_qris_image',
     ];
 
     private const NUMERIC_KEYS = [
