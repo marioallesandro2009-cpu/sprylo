@@ -5,6 +5,18 @@
 
 @section('content')
 
+  <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
+    <form method="GET" class="d-flex gap-2">
+      <select name="status" class="form-select form-select-sm" style="width:180px" onchange="this.form.submit()">
+        <option value="">All statuses</option>
+        @foreach(\App\Models\Order::STATUSES as $status)
+          <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+        @endforeach
+      </select>
+      <noscript><button type="submit" class="btn btn-sm btn-outline-secondary">Filter</button></noscript>
+    </form>
+  </div>
+
   <div class="card-admin">
     <div class="table-responsive">
       <table class="table table-admin align-middle">
@@ -18,7 +30,7 @@
               <td>{{ $order->name }}<div class="text-muted small">{{ $order->email }}</div></td>
               <td>{{ $order->items_count }}</td>
               <td>{{ rupiah($order->total) }}</td>
-              <td><span class="badge bg-primary-subtle text-primary text-capitalize">{{ $order->status }}</span></td>
+              <td><span class="badge {{ $order->status_badge_class }} text-capitalize">{{ $order->status }}</span></td>
               <td class="text-muted small">{{ $order->created_at->format('d M Y, H:i') }}</td>
               <td class="text-end">
                 <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>

@@ -33,7 +33,9 @@
       </div>
       <div class="col-md-6">
         <div class="text-muted small">Status</div>
-        <div class="fw-semibold text-capitalize">{{ $order->status }}</div>
+        <div class="fw-semibold">
+          <span class="badge {{ $order->status_badge_class }} text-capitalize">{{ $order->status }}</span>
+        </div>
       </div>
       <div class="col-12">
         <div class="text-muted small">Shipping address</div>
@@ -103,6 +105,22 @@
       @endif
       <div class="fw-bold fs-5">Total: {{ rupiah($order->total) }}</div>
     </div>
+  </div>
+
+  <div class="card-admin mt-3" style="max-width:720px">
+    <div class="text-muted small mb-2">Update status</div>
+    <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="d-flex gap-2">
+      @csrf @method('PATCH')
+      <select name="status" class="form-select form-select-sm" style="width:200px">
+        @foreach(\App\Models\Order::STATUSES as $status)
+          <option value="{{ $status }}" @selected($order->status === $status)>{{ ucfirst($status) }}</option>
+        @endforeach
+      </select>
+      <button type="submit" class="btn btn-admin-primary btn-sm">Save status</button>
+    </form>
+    @if($order->status !== 'cancelled')
+      <div class="text-muted small mt-2">Cancelling restores the ordered items to stock; moving a cancelled order back to an active status deducts stock again.</div>
+    @endif
   </div>
 
   <div class="mt-3">

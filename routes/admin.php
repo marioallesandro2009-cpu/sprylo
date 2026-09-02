@@ -46,6 +46,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
         Route::resource('promo-codes', PromoCodeController::class)->except(['show']);
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
+        Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
 
         Route::get('settings', [SiteSettingController::class, 'index'])->name('settings.index');
         Route::put('settings', [SiteSettingController::class, 'update'])->name('settings.update');

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
 use App\Models\PageMeta;
+use App\Models\Product;
 use App\Models\Setting;
 use App\Services\BiteshipService;
 use App\Support\Cart;
@@ -12,9 +14,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use RuntimeException;
+use Throwable;
 
 class CheckoutController extends Controller
 {
@@ -137,6 +143,18 @@ class CheckoutController extends Controller
             : null;
 
         $order = DB::transaction(function () use ($data, $cartItems, $totals, $selectedCourier, $shippingFee, $grandTotal, $paymentProofPath) {
+            // Lock each product row before checking stock so two shoppers checking out the
+            // same low-stock item at once can't both pass the availability check.
+            foreach ($cartItems as $item) {
+                $product = Product::whereKey($item['product']->id)->lockForUpdate()->first();
+
+                if ($product->stock < $item['qty']) {
+                    throw ValidationException::withMessages([
+                        'stock' => "Sorry, only {$product->stock} of \"{$product->name}\" left in stock.",
+                    ]);
+                }
+            }
+
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
                 'name' => $data['name'],
@@ -159,6 +177,7 @@ class CheckoutController extends Controller
                 'promo_code' => $totals['promo_code'],
                 'promo_discount' => $totals['promo_discount'],
                 'total' => $grandTotal,
+                'status' => 'pending',
                 'payment_method' => $data['payment_method'],
                 'payment_proof_path' => $paymentProofPath,
             ]);
@@ -171,12 +190,21 @@ class CheckoutController extends Controller
                     'qty' => $item['qty'],
                     'subtotal' => $item['subtotal'],
                 ]);
+
+                Product::whereKey($item['product']->id)->decrement('stock', $item['qty']);
             }
 
             return $order;
         });
 
         Cart::clear();
+
+        try {
+            Mail::to($order->email)->send(new OrderConfirmationMail($order));
+        } catch (Throwable $e) {
+            // A failed confirmation email shouldn't undo an already-placed order.
+            Log::error('Failed to send order confirmation email', ['order' => $order->order_number, 'error' => $e->getMessage()]);
+        }
 
         return redirect()->route('checkout.confirmation', $order);
     }

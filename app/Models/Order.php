@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 
 class Order extends Model
 {
+    public const STATUSES = ['pending', 'paid', 'processing', 'shipped', 'completed', 'cancelled'];
+
     protected $fillable = [
         'order_number', 'name', 'email', 'phone', 'address', 'city', 'postal_code', 'notes',
         'latitude', 'longitude',
@@ -34,6 +36,19 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function getStatusBadgeClassAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'bg-warning-subtle text-warning',
+            'paid' => 'bg-info-subtle text-info',
+            'processing' => 'bg-primary-subtle text-primary',
+            'shipped' => 'bg-dark-subtle text-dark',
+            'completed' => 'bg-success-subtle text-success',
+            'cancelled' => 'bg-danger-subtle text-danger',
+            default => 'bg-secondary-subtle text-secondary',
+        };
     }
 
     public static function generateOrderNumber(): string
