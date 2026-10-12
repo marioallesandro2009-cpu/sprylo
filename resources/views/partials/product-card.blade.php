@@ -21,17 +21,24 @@
     @endif
     <img src="{{ $image }}" alt="{{ $product->name }}" />
   </div>
-  <div class="stock"><span class="dot"></span>In stock · {{ $product->stock }} items</div>
+  <div class="stock">
+    <span class="dot @if($product->stock < 1) is-out @endif"></span>
+    @if($product->stock < 1) Sold out @else In stock · {{ $product->stock }} items @endif
+  </div>
   <a href="{{ route('product.show', $product) }}" class="name">{{ $product->name }}</a>
   <div class="price">
-    <span class="now">{{ rupiah($displayPrice) }}</span>
-    @if($product->sale_price)
-      <span class="was">{{ rupiah($product->price) }}</span>
+    @if($product->has_variants)
+      <span class="now">From {{ rupiah($displayPrice) }}</span>
+    @else
+      <span class="now">{{ rupiah($displayPrice) }}</span>
+      @if($product->sale_price)
+        <span class="was">{{ rupiah($product->price) }}</span>
+      @endif
     @endif
   </div>
   <div class="stars">{{ str_repeat('★', $rating) }}{{ str_repeat('☆', 5 - $rating) }} <span class="count">({{ $product->reviews_count }})</span></div>
   <form action="{{ route('cart.add', $product) }}" method="POST">
     @csrf
-    <button type="submit" class="btn" @disabled($product->stock < 1)>{{ $product->stock < 1 ? 'Out of stock' : 'Order now →' }}</button>
+    <button type="submit" class="btn" @disabled($product->stock < 1)>{{ $product->stock < 1 ? 'Sold out' : 'Order now →' }}</button>
   </form>
 </article>

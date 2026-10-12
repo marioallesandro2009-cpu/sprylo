@@ -10,11 +10,12 @@ class ProductController extends Controller
     public function show(string $product)
     {
         $product = Product::withRatingStats()
-            ->with(['images', 'category', 'brand'])
+            ->with(['images', 'category', 'brand', 'variants'])
             ->where('slug', $product)
             ->firstOrFail();
 
         $specs = [
+            ...($product->specs ?? []),
             ['label' => 'Category', 'value' => $product->category->name],
             ['label' => 'Brand', 'value' => $product->brand->name ?? '—'],
             ['label' => 'Price', 'value' => rupiah($product->price)],

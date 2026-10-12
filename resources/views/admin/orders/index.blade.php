@@ -10,7 +10,7 @@
       <select name="status" class="form-select form-select-sm" style="width:180px" onchange="this.form.submit()">
         <option value="">All statuses</option>
         @foreach(\App\Models\Order::STATUSES as $status)
-          <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+          <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
         @endforeach
       </select>
       <noscript><button type="submit" class="btn btn-sm btn-outline-secondary">Filter</button></noscript>
@@ -30,7 +30,7 @@
               <td>{{ $order->name }}<div class="text-muted small">{{ $order->email }}</div></td>
               <td>{{ $order->items_count }}</td>
               <td>{{ rupiah($order->total) }}</td>
-              <td><span class="badge {{ $order->status_badge_class }} text-capitalize">{{ $order->status }}</span></td>
+              <td><span class="badge {{ $order->status_badge_class }} text-capitalize">{{ str_replace('_', ' ', $order->status) }}</span></td>
               <td class="text-muted small">{{ $order->created_at->format('d M Y, H:i') }}</td>
               <td class="text-end">
                 <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>

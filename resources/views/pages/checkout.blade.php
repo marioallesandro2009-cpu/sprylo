@@ -19,4 +19,5 @@
     <script src="{{ asset('assets/js/checkout-map.js') }}" defer></script>
     <script src="{{ asset('assets/js/checkout-shipping.js') }}" defer></script>
     <script src="{{ asset('assets/js/checkout-payment.js') }}" defer></script>
+    <script src="{{ asset('assets/js/checkout-variant.js') }}" defer></script>
 @endpush

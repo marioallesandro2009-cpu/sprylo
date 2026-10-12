@@ -10,33 +10,7 @@
   <div class="container" style="max-width: 640px">
     <div style="background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r); padding: var(--s7)">
 
-      <div style="display: grid; gap: var(--s3); margin-bottom: var(--s5)">
-        @foreach($order->items as $item)
-          <div style="display:flex; justify-content:space-between; gap:var(--s3); font-size: var(--text-sm)">
-            <span style="color: var(--fg-soft)">{{ $item->product_name }} × {{ $item->qty }}</span>
-            <span style="font-weight:600; white-space:nowrap">{{ rupiah($item->subtotal) }}</span>
-          </div>
-        @endforeach
-      </div>
-
-      <div class="cart-line"><span>Subtotal</span><span>{{ rupiah($order->subtotal) }}</span></div>
-      <div class="cart-line">
-        <span>Shipping @if($order->courier_name)({{ $order->courier_name }} — {{ $order->courier_service_name }})@endif</span>
-        <span>{{ $order->shipping == 0.0 ? 'Free' : rupiah($order->shipping) }}</span>
-      </div>
-      <div class="cart-line"><span>Tax</span><span>{{ rupiah($order->tax) }}</span></div>
-      @if($order->promo_discount > 0)
-        <div class="cart-line"><span>Promo · {{ $order->promo_code }}</span><span>−{{ rupiah($order->promo_discount) }}</span></div>
-      @endif
-      <div class="cart-line is-total"><span>Total</span><span>{{ rupiah($order->total) }}</span></div>
-
-      <div style="margin-top: var(--s6); padding-top: var(--s6); border-top: 1px solid var(--rule)">
-        <div class="label" style="font-family: var(--ff-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-mute); margin-bottom: var(--s2)">Shipping to</div>
-        <div style="font-weight:600">{{ $order->name }}</div>
-        <div style="color: var(--fg-soft); font-size: var(--text-sm); white-space: pre-line">{{ $order->address }}
-{{ $order->city }}, {{ $order->postal_code }}</div>
-        <div style="color: var(--fg-soft); font-size: var(--text-sm); margin-top: var(--s2)">{{ $order->phone }} · {{ $order->email }}</div>
-      </div>
+      @include('partials.order-summary-card')
 
       <div style="margin-top: var(--s6); padding-top: var(--s6); border-top: 1px solid var(--rule)">
         <div class="label" style="font-family: var(--ff-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-mute); margin-bottom: var(--s2)">Payment</div>
@@ -45,8 +19,36 @@
             <img src="{{ $settings['payment_qris_image'] }}" alt="QRIS payment code" class="payment-qris-image" />
           @endif
           <p class="payment-qris-note">Scan the QRIS code above to complete your payment of {{ rupiah($order->total) }}.</p>
+        @elseif($order->payment_proof_path)
+          @if(session('success'))
+            <p style="color: var(--emerald); font-weight: 600; margin-bottom: var(--s2)">{{ session('success') }}</p>
+          @endif
+          <p style="color: var(--fg-soft); font-size: var(--text-sm)">Proof received — awaiting verification by our team.</p>
         @else
-          <p style="color: var(--fg-soft); font-size: var(--text-sm)">Transfer proof received — we'll verify it and confirm your order shortly.</p>
+          <p style="color: var(--fg-soft); font-size: var(--text-sm); margin-bottom: var(--s4)">
+            Please transfer {{ rupiah($order->total) }} to the account below, then upload your proof of payment
+            so we can confirm your order.
+          </p>
+          <div class="payment-bank-details">
+            <div><span>Bank</span><strong>{{ $settings['payment_bank_name'] ?? '—' }}</strong></div>
+            <div><span>Account no.</span><strong>{{ $settings['payment_bank_account_number'] ?? '—' }}</strong></div>
+            <div><span>Account holder</span><strong>{{ $settings['payment_bank_account_holder'] ?? '—' }}</strong></div>
+          </div>
+          @if($canUploadProof && $order->status === 'awaiting_proof')
+            <form action="{{ route('checkout.payment-proof', $order) }}" method="POST" enctype="multipart/form-data" style="margin-top: var(--s5)">
+              @csrf
+              <div class="field">
+                <label for="co-payment-proof">Upload transfer proof</label>
+                <input id="co-payment-proof" name="payment_proof" type="file" accept="image/*" required />
+              </div>
+              @error('payment_proof')
+                <p style="color: var(--rose); font-size: var(--text-sm); margin-top: var(--s2)">{{ $message }}</p>
+              @enderror
+              <button type="submit" class="btn btn--indigo" style="margin-top: var(--s4)">Submit proof →</button>
+            </form>
+          @else
+            <a href="{{ route('track-order.index', ['order_number' => $order->order_number]) }}" class="btn btn--indigo" style="margin-top: var(--s4)">Upload transfer proof →</a>
+          @endif
         @endif
       </div>
 

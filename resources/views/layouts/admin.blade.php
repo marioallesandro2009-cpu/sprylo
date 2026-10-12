@@ -84,8 +84,15 @@
       <a href="{{ route('admin.hero-slides.index') }}" class="admin-nav-link {{ request()->routeIs('admin.hero-slides.*') ? 'active' : '' }}"><i class="fa-solid fa-images"></i> Hero Slides</a>
       <a href="{{ route('admin.promo-banners.index') }}" class="admin-nav-link {{ request()->routeIs('admin.promo-banners.*') ? 'active' : '' }}"><i class="fa-solid fa-tag"></i> Promo Banners</a>
 
+      <div class="admin-nav-section">Customers</div>
+      <a href="{{ route('admin.users.index') }}" class="admin-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"><i class="fa-solid fa-users"></i> Users</a>
+      <a href="{{ route('admin.suspended-customers.index') }}" class="admin-nav-link {{ request()->routeIs('admin.suspended-customers.*') ? 'active' : '' }}"><i class="fa-solid fa-user-slash"></i> Suspended Customers</a>
+      <a href="{{ route('admin.newsletter-subscribers.index') }}" class="admin-nav-link {{ request()->routeIs('admin.newsletter-subscribers.*') ? 'active' : '' }}"><i class="fa-solid fa-paper-plane"></i> Newsletter</a>
+
       <div class="admin-nav-section">Configuration</div>
+      <a href="{{ route('admin.content.index') }}" class="admin-nav-link {{ request()->routeIs('admin.content.*') ? 'active' : '' }}"><i class="fa-solid fa-pen-to-square"></i> Page Content</a>
       <a href="{{ route('admin.settings.index') }}" class="admin-nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"><i class="fa-solid fa-gear"></i> Site Settings</a>
+      <a href="{{ route('admin.page-meta.index') }}" class="admin-nav-link {{ request()->routeIs('admin.page-meta.*') ? 'active' : '' }}"><i class="fa-solid fa-globe"></i> SEO / Page Meta</a>
       <a href="{{ route('admin.account.edit') }}" class="admin-nav-link {{ request()->routeIs('admin.account.*') ? 'active' : '' }}"><i class="fa-solid fa-user"></i> My Account</a>
     </nav>
   </div>

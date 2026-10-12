@@ -29,6 +29,7 @@
   @include('partials.footer')
 
   <script src="{{ asset('assets/js/main.js') }}" defer></script>
+  <script src="{{ asset('assets/js/search.js') }}" defer></script>
   @stack('scripts')
 </body>
 </html>

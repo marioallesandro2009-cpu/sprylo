@@ -9,24 +9,67 @@ use Illuminate\Support\Collection;
 
 class Cart
 {
+    /**
+     * Cart entries are keyed "{productId}" or "{productId}:{variantId}" so a product with
+     * variants can sit in the cart multiple times — once per variant chosen.
+     */
+    public static function key(int $productId, ?int $variantId): string
+    {
+        return $variantId ? "{$productId}:{$variantId}" : (string) $productId;
+    }
+
+    /**
+     * @return array{product_id: int, variant_id: ?int}
+     */
+    public static function parseKey(string $key): array
+    {
+        [$productId, $variantId] = array_pad(explode(':', $key, 2), 2, null);
+
+        return [
+            'product_id' => (int) $productId,
+            'variant_id' => $variantId !== null ? (int) $variantId : null,
+        ];
+    }
+
     public static function items(): Collection
     {
         $cart = session('cart', []);
-        $products = Product::with('images')->whereIn('id', array_keys($cart))->get()->keyBy('id');
+        $productIds = collect(array_keys($cart))->map(fn ($key) => static::parseKey($key)['product_id'])->unique();
+
+        $products = Product::with(['images', 'variants'])->whereIn('id', $productIds)->get()->keyBy('id');
 
         return collect($cart)
-            ->filter(fn ($qty, $productId) => $products->has($productId))
-            ->map(function ($qty, $productId) use ($products) {
-                $product = $products->get($productId);
-                $unitPrice = $product->sale_price ?? $product->price;
+            ->map(function ($qty, $key) use ($products) {
+                $parsed = static::parseKey($key);
+                $product = $products->get($parsed['product_id']);
+
+                if (! $product) {
+                    return null;
+                }
+
+                $variant = $parsed['variant_id'] ? $product->variants->firstWhere('id', $parsed['variant_id']) : null;
+
+                if ($parsed['variant_id'] && ! $variant) {
+                    return null;
+                }
+
+                $unitPrice = $variant ? ($variant->sale_price ?? $variant->price) : ($product->sale_price ?? $product->price);
+                $stock = $variant ? $variant->stock : $product->stock;
+                $weight = $variant ? $variant->weight : $product->weight;
 
                 return [
+                    'cart_key' => $key,
                     'product' => $product,
+                    'variant' => $variant,
                     'qty' => $qty,
                     'unit_price' => $unitPrice,
                     'subtotal' => $unitPrice * $qty,
+                    'stock' => $stock,
+                    'weight' => $weight,
+                    'has_warranty' => (bool) $variant?->has_warranty,
                 ];
             })
+            ->filter()
             ->values();
     }
 

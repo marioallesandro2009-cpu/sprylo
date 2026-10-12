@@ -8,26 +8,55 @@
   const lngInput = document.getElementById('co-longitude');
   const courierCodeInput = document.getElementById('co-courier-code');
   const courierServiceInput = document.getElementById('co-courier-service-code');
-  const summaryShipping = document.getElementById('summary-shipping');
-  const summaryTotal = document.getElementById('summary-total');
+  const insuranceCheckbox = document.getElementById('co-insurance');
+  // Looked up on each use: the order summary is re-rendered when an option changes.
+  const summaryShipping = () => document.getElementById('summary-shipping');
+  const summaryTotal = () => document.getElementById('summary-total');
+  const summaryInsuranceRow = () => document.getElementById('summary-insurance-row');
+  const summaryInsurance = () => document.getElementById('summary-insurance');
   const form = listEl.closest('form');
 
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
   const ratesUrl = form.dataset.ratesUrl;
 
+  // Insurance is an order-wide checkbox picked at checkout (not tied to any product
+  // variant), so its fee is folded into the same total the courier price feeds.
+  let lastShippingFee = 0;
+
   function formatRupiah(amount) {
     return 'Rp ' + Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  function currentInsuranceFee() {
+    return insuranceCheckbox && insuranceCheckbox.checked ? parseFloat(insuranceCheckbox.dataset.fee || '0') : 0;
   }
 
   function refreshBtnAvailability() {
     btn.disabled = !(latInput.value && lngInput.value);
   }
 
-  function updateTotals(shippingFee) {
-    const base = parseFloat(summaryTotal.dataset.base || '0');
-    summaryShipping.textContent = shippingFee === 0 ? 'Free' : formatRupiah(shippingFee);
-    summaryTotal.textContent = formatRupiah(base + shippingFee);
+  // Re-applies the insurance row and total without touching the shipping line, so it can also
+  // run after the summary is swapped out for a fresh server render (variant change).
+  function syncInsuranceAndTotal() {
+    const base = parseFloat(summaryTotal().dataset.base || '0');
+    const insuranceFee = currentInsuranceFee();
+
+    const row = summaryInsuranceRow();
+    if (row) {
+      row.style.display = insuranceFee > 0 ? 'flex' : 'none';
+      if (insuranceFee > 0) summaryInsurance().textContent = formatRupiah(insuranceFee);
+    }
+
+    summaryTotal().textContent = formatRupiah(base + lastShippingFee + insuranceFee);
   }
+
+  function updateTotals(shippingFee) {
+    lastShippingFee = shippingFee;
+    summaryShipping().textContent = shippingFee === 0 ? 'Free' : formatRupiah(shippingFee);
+    syncInsuranceAndTotal();
+  }
+
+  document.addEventListener('checkout:summary-replaced', syncInsuranceAndTotal);
 
   function selectCourier(option, cardEl) {
     courierCodeInput.value = option.courier_code;
@@ -84,7 +113,7 @@
     courierCodeInput.value = '';
     courierServiceInput.value = '';
     updateTotals(0);
-    summaryShipping.textContent = 'Select a courier below';
+    summaryShipping().textContent = 'Select a courier below';
 
     try {
       const res = await fetch(ratesUrl, {
@@ -114,6 +143,10 @@
   }
 
   btn.addEventListener('click', checkCouriers);
+
+  // Toggling insurance doesn't change the courier, so just recompute the total with
+  // whichever shipping fee is already selected.
+  insuranceCheckbox && insuranceCheckbox.addEventListener('change', () => updateTotals(lastShippingFee));
 
   // Fetch automatically as soon as a pin is dropped — placing the order no longer
   // requires the shopper to separately press "Check couriers" first.

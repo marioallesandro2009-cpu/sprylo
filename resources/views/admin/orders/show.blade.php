@@ -34,7 +34,7 @@
       <div class="col-md-6">
         <div class="text-muted small">Status</div>
         <div class="fw-semibold">
-          <span class="badge {{ $order->status_badge_class }} text-capitalize">{{ $order->status }}</span>
+          <span class="badge {{ $order->status_badge_class }} text-capitalize">{{ str_replace('_', ' ', $order->status) }}</span>
         </div>
       </div>
       <div class="col-12">
@@ -59,6 +59,17 @@
           @endif
         </div>
       </div>
+      @if($order->requested_delivery_date)
+        <div class="col-md-6">
+          <div class="text-muted small">Requested delivery date</div>
+          <div class="fw-semibold">
+            {{ $order->requested_delivery_date->format('d M Y') }}
+            @if($order->requested_delivery_date->isToday() || $order->requested_delivery_date->isTomorrow())
+              <span class="badge bg-warning-subtle text-warning-emphasis">Coming up soon</span>
+            @endif
+          </div>
+        </div>
+      @endif
       <div class="col-md-6">
         <div class="text-muted small">Payment method</div>
         <div class="fw-semibold text-capitalize">
@@ -86,7 +97,16 @@
         <tbody>
           @foreach($order->items as $item)
             <tr>
-              <td>{{ $item->product_name }}</td>
+              <td>
+                {{ $item->product_name }}@if($item->variant_label) <span class="text-muted small">({{ $item->variant_label }})</span>@endif
+                @if($item->product_variant_id)
+                  @if($item->has_warranty)
+                    <span class="badge bg-success-subtle text-success-emphasis">Warranty incl.</span>
+                  @else
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis">No warranty</span>
+                  @endif
+                @endif
+              </td>
               <td>{{ $item->qty }}</td>
               <td>{{ rupiah($item->unit_price) }}</td>
               <td>{{ rupiah($item->subtotal) }}</td>
@@ -100,6 +120,9 @@
       <div class="text-muted small">Subtotal: {{ rupiah($order->subtotal) }}</div>
       <div class="text-muted small">Shipping: {{ $order->shipping == 0.0 ? 'Free' : rupiah($order->shipping) }}</div>
       <div class="text-muted small">Tax: {{ rupiah($order->tax) }}</div>
+      @if($order->has_insurance)
+        <div class="text-muted small">Shipping insurance: {{ rupiah($order->insurance_fee) }}</div>
+      @endif
       @if($order->promo_discount > 0)
         <div class="text-muted small">Promo ({{ $order->promo_code }}): −{{ rupiah($order->promo_discount) }}</div>
       @endif
@@ -113,7 +136,7 @@
       @csrf @method('PATCH')
       <select name="status" class="form-select form-select-sm" style="width:200px">
         @foreach(\App\Models\Order::STATUSES as $status)
-          <option value="{{ $status }}" @selected($order->status === $status)>{{ ucfirst($status) }}</option>
+          <option value="{{ $status }}" @selected($order->status === $status)>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
         @endforeach
       </select>
       <button type="submit" class="btn btn-admin-primary btn-sm">Save status</button>

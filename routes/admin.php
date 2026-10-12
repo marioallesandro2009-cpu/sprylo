@@ -10,12 +10,15 @@ use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\FooterLinkController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PageContentController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\PromoBannerController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SiteSettingController;
+use App\Http\Controllers\Admin\SuspendedCustomerController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -38,6 +41,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('brands', BrandController::class)->except(['show']);
         Route::resource('reviews', ReviewController::class)->except(['show']);
         Route::resource('faqs', FaqController::class)->except(['show']);
+        Route::resource('page-meta', \App\Http\Controllers\Admin\PageMetaController::class)->parameters(['page-meta' => 'pageMeta'])->only(['index', 'edit', 'update']);
+        Route::get('newsletter-subscribers/export', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'export'])->name('newsletter-subscribers.export');
+        Route::resource('newsletter-subscribers', \App\Http\Controllers\Admin\NewsletterSubscriberController::class)->only(['index', 'destroy']);
         Route::resource('footer-links', FooterLinkController::class)->except(['show']);
 
         Route::resource('hero-slides', HeroSlideController::class)->except(['show']);
@@ -48,8 +54,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
         Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
 
+        Route::get('content', [PageContentController::class, 'index'])->name('content.index');
+        Route::put('content', [PageContentController::class, 'update'])->name('content.update');
+        Route::post('content/scan', [PageContentController::class, 'scan'])->name('content.scan');
+
         Route::get('settings', [SiteSettingController::class, 'index'])->name('settings.index');
         Route::put('settings', [SiteSettingController::class, 'update'])->name('settings.update');
+
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::patch('users/{user}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
+        Route::patch('users/{user}/ban', [UserController::class, 'ban'])->name('users.ban');
+        Route::patch('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
+
+        Route::resource('suspended-customers', SuspendedCustomerController::class)->only(['index', 'store', 'destroy']);
     });
 
 });

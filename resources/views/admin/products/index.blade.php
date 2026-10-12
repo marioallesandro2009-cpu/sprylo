@@ -38,9 +38,12 @@
               <td class="fw-semibold">{{ $product->name }}</td>
               <td class="text-muted small">{{ $product->category->name }}</td>
               <td>
-                {{ rupiah($product->sale_price ?? $product->price) }}
+                {{ $product->has_variants ? 'From ' : '' }}{{ rupiah($product->sale_price ?? $product->price) }}
                 @if($product->sale_price)
                   <span class="text-muted text-decoration-line-through small">{{ rupiah($product->price) }}</span>
+                @endif
+                @if($product->has_variants)
+                  <span class="badge bg-light text-dark border ms-1">{{ $product->variants_count }} variant(s)</span>
                 @endif
               </td>
               <td>{{ $product->stock }}</td>

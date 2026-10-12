@@ -23,6 +23,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
+        'status_reason',
+        'suspended_until',
     ];
 
     /**
@@ -45,11 +48,35 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'suspended_until' => 'datetime',
         ];
     }
 
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->status === 'banned';
+    }
+
+    public function isSuspended(): bool
+    {
+        if ($this->status !== 'suspended') {
+            return false;
+        }
+
+        if ($this->suspended_until && $this->suspended_until->isPast()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isActive(): bool
+    {
+        return ! $this->isBanned() && ! $this->isSuspended();
     }
 }

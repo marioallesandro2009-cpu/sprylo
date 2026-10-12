@@ -37,10 +37,16 @@ class SiteSettingController extends Controller
         'footer_credit_text',
         'payment_bank_name', 'payment_bank_account_number', 'payment_bank_account_holder',
         'payment_qris_image',
+        'shop_head_title', 'shop_head_text',
+        'contact_head_title', 'contact_head_text',
+        'checkout_head_title', 'checkout_head_text',
+        'help_head_title', 'help_head_text',
+        'cart_empty_text', 'wishlist_empty_text',
+        'newsletter_placeholder', 'newsletter_button_label', 'newsletter_success_text',
     ];
 
     private const NUMERIC_KEYS = [
-        'shipping_free_threshold', 'shipping_fee',
+        'shipping_free_threshold', 'shipping_fee', 'insurance_fee',
     ];
 
     private const SECTION_KEYS = [

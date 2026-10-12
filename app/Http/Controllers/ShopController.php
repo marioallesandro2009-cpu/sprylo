@@ -19,7 +19,13 @@ class ShopController extends Controller
             ->where('is_active', true);
 
         if ($request->filled('q')) {
-            $query->where('name', 'like', '%'.$request->q.'%');
+            $term = $request->q;
+            $query->where(function ($sub) use ($term) {
+                $sub->where('name', 'like', '%'.$term.'%')
+                    ->orWhere('description', 'like', '%'.$term.'%')
+                    ->orWhereHas('brand', fn ($q) => $q->where('name', 'like', '%'.$term.'%'))
+                    ->orWhereHas('category', fn ($q) => $q->where('name', 'like', '%'.$term.'%'));
+            });
         }
         if ($request->filled('categories')) {
             $query->whereIn('category_id', (array) $request->categories);

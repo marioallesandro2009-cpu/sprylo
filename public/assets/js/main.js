@@ -55,13 +55,15 @@
     });
   });
 
-  // Qty +/- buttons
-  document.querySelectorAll('.qty').forEach((q) => {
-    const input = q.querySelector('input');
-    const minus = q.querySelector('[data-act="-"]');
-    const plus  = q.querySelector('[data-act="+"]');
-    minus && minus.addEventListener('click', () => { input.value = Math.max(1, parseInt(input.value || 1) - 1); });
-    plus  && plus.addEventListener('click', () => { input.value = parseInt(input.value || 1) + 1; });
+  // Qty +/- buttons — delegated so it still works after AJAX-swapped cart markup
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.qty [data-act]');
+    if (!btn) return;
+    const input = btn.closest('.qty').querySelector('input');
+    if (!input) return;
+    input.value = btn.dataset.act === '-'
+      ? Math.max(1, parseInt(input.value || 1) - 1)
+      : parseInt(input.value || 1) + 1;
   });
 
   // Color swatches & option pills (visual switch)

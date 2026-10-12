@@ -187,6 +187,11 @@
           <label class="form-label small fw-semibold">Shipping fee below threshold (Rp)</label>
           <input type="number" step="1" min="0" name="shipping_fee" class="form-control" value="{{ old('shipping_fee', $settings['shipping_fee'] ?? '') }}" />
         </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Shipping insurance fee (Rp)</label>
+          <input type="number" step="1" min="0" name="insurance_fee" class="form-control" value="{{ old('insurance_fee', $settings['insurance_fee'] ?? '') }}" />
+          <div class="form-text">Shown as an optional add-on at checkout — the shopper picks it there, not when choosing a product option.</div>
+        </div>
       </div>
     </div>
 
@@ -332,6 +337,42 @@
           <input type="text" name="payment_qris_image" class="form-control" placeholder="/storage/payment/qris.png"
                  value="{{ old('payment_qris_image', $settings['payment_qris_image'] ?? '') }}" />
           <div class="form-text">Static QRIS image shown at checkout. Upload the image file yourself and paste its URL here — no dynamic/per-transaction QRIS is generated.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Page Headings &amp; Empty States</h6>
+      <div class="row g-3">
+        @foreach(['shop' => 'Shop', 'contact' => 'Contact', 'checkout' => 'Checkout', 'help' => 'Help centre'] as $slug => $label)
+          <div class="col-md-5">
+            <label class="form-label small fw-semibold">{{ $label }} — heading</label>
+            <input type="text" name="{{ $slug }}_head_title" class="form-control" value="{{ old("{$slug}_head_title", $settings["{$slug}_head_title"] ?? '') }}" />
+          </div>
+          <div class="col-md-7">
+            <label class="form-label small fw-semibold">{{ $label }} — description</label>
+            <textarea name="{{ $slug }}_head_text" rows="2" class="form-control">{{ old("{$slug}_head_text", $settings["{$slug}_head_text"] ?? '') }}</textarea>
+          </div>
+        @endforeach
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Empty cart text</label>
+          <input type="text" name="cart_empty_text" class="form-control" value="{{ old('cart_empty_text', $settings['cart_empty_text'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Empty wishlist text</label>
+          <input type="text" name="wishlist_empty_text" class="form-control" value="{{ old('wishlist_empty_text', $settings['wishlist_empty_text'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Newsletter placeholder</label>
+          <input type="text" name="newsletter_placeholder" class="form-control" value="{{ old('newsletter_placeholder', $settings['newsletter_placeholder'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Newsletter button label</label>
+          <input type="text" name="newsletter_button_label" class="form-control" value="{{ old('newsletter_button_label', $settings['newsletter_button_label'] ?? '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Newsletter success message</label>
+          <input type="text" name="newsletter_success_text" class="form-control" value="{{ old('newsletter_success_text', $settings['newsletter_success_text'] ?? '') }}" />
         </div>
       </div>
     </div>

@@ -18,13 +18,20 @@
           <tr>
             <td style="padding:28px 32px;">
               <p style="margin:0 0 16px; font-size:14px; line-height:1.5;">
-                Hi {{ $order->name }}, we've received your order <strong>{{ $order->order_number }}</strong> and it's now <strong>{{ $order->status }}</strong>. We'll email you again once it ships.
+                Hi {{ $order->name }}, we've received your order <strong>{{ $order->order_number }}</strong> and it's now <strong>{{ ucfirst(str_replace('_', ' ', $order->status)) }}</strong>. We'll email you again once it ships.
               </p>
+
+              @if($order->payment_method === 'bank_transfer' && $order->status === 'awaiting_proof')
+                <p style="margin:0 0 16px; font-size:14px; line-height:1.5;">
+                  Please transfer {{ rupiah($order->total) }} to our account and upload your proof of payment here:
+                  <a href="{{ route('track-order.index', ['order_number' => $order->order_number]) }}">Upload transfer proof</a>.
+                </p>
+              @endif
 
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px; margin-bottom:16px;">
                 @foreach($order->items as $item)
                   <tr>
-                    <td style="padding:6px 0; color:#52525b;">{{ $item->product_name }} × {{ $item->qty }}</td>
+                    <td style="padding:6px 0; color:#52525b;">{{ $item->product_name }}@if($item->variant_label) ({{ $item->variant_label }})@endif × {{ $item->qty }}</td>
                     <td style="padding:6px 0; text-align:right; font-weight:600;">{{ rupiah($item->subtotal) }}</td>
                   </tr>
                 @endforeach
@@ -34,6 +41,9 @@
                 <tr><td style="padding:4px 0;">Subtotal</td><td style="padding:4px 0; text-align:right;">{{ rupiah($order->subtotal) }}</td></tr>
                 <tr><td style="padding:4px 0;">Shipping</td><td style="padding:4px 0; text-align:right;">{{ $order->shipping == 0.0 ? 'Free' : rupiah($order->shipping) }}</td></tr>
                 <tr><td style="padding:4px 0;">Tax</td><td style="padding:4px 0; text-align:right;">{{ rupiah($order->tax) }}</td></tr>
+                @if($order->has_insurance)
+                  <tr><td style="padding:4px 0;">Shipping insurance</td><td style="padding:4px 0; text-align:right;">{{ rupiah($order->insurance_fee) }}</td></tr>
+                @endif
                 @if($order->promo_discount > 0)
                   <tr><td style="padding:4px 0;">Promo ({{ $order->promo_code }})</td><td style="padding:4px 0; text-align:right;">−{{ rupiah($order->promo_discount) }}</td></tr>
                 @endif
@@ -44,6 +54,9 @@
                 <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#a1a1aa; margin-bottom:6px;">Shipping to</div>
                 <div style="font-size:14px; font-weight:600;">{{ $order->name }}</div>
                 <div style="font-size:13px; color:#52525b; line-height:1.5;">{{ $order->address }}<br>{{ $order->city }}, {{ $order->postal_code }}</div>
+                @if($order->requested_delivery_date)
+                  <div style="font-size:13px; color:#52525b; margin-top:8px;">Requested delivery: {{ $order->requested_delivery_date->format('d M Y') }}</div>
+                @endif
               </div>
             </td>
           </tr>

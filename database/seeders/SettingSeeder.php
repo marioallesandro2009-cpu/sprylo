@@ -44,7 +44,7 @@ class SettingSeeder extends Seeder
             'newsletter_description' => "Drop your email and we'll send a one-time discount, plus first-look offers on the gear we just got in. Unsubscribe anytime.",
 
             'utility_link1_label' => 'Track order',
-            'utility_link1_url' => '#',
+            'utility_link1_url' => '/track-order',
             'utility_link2_label' => 'Help',
             'utility_link2_url' => '#',
             'utility_link3_label' => 'ID · IDR',
@@ -79,6 +79,7 @@ class SettingSeeder extends Seeder
 
             'shipping_free_threshold' => '750000',
             'shipping_fee' => '25000',
+            'insurance_fee' => '15000',
 
             'contact_reply_sla_text' => 'Message sent — we will reply within 4 hours.',
 
@@ -97,7 +98,7 @@ class SettingSeeder extends Seeder
         Setting::where('key', 'nav_cta_text')->delete();
 
         foreach ($settings as $key => $value) {
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            Setting::firstOrCreate(['key' => $key], ['value' => $value]);
         }
     }
 }

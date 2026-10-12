@@ -1,4 +1,4 @@
-<form class="contact-form" action="{{ route('checkout.store') }}" method="POST" enctype="multipart/form-data" data-rates-url="{{ route('checkout.rates') }}">
+<form class="contact-form" action="{{ route('checkout.store') }}" method="POST" data-rates-url="{{ route('checkout.rates') }}" data-postal-lookup-url="{{ route('checkout.postal-lookup') }}">
   @csrf
   <h2 style="font-size: var(--text-xl); margin-bottom: var(--s4)">Shipping details</h2>
 
@@ -50,7 +50,25 @@
   </div>
 
   <div class="field">
+    <label for="co-delivery-date">Requested delivery date (optional)</label>
+    <input id="co-delivery-date" name="requested_delivery_date" type="date"
+      min="{{ now()->addDay()->toDateString() }}" max="{{ now()->addDays(90)->toDateString() }}"
+      value="{{ old('requested_delivery_date') }}" />
+    <p style="color: var(--fg-soft); font-size: var(--text-sm); margin-top: var(--s2)">
+      Timing it for a birthday, a launch event, or just making sure someone's home to sign for it? Pick a date and
+      we'll aim to deliver on or just before it. Best-effort — it depends on the courier's own delivery window.</p>
+    @error('requested_delivery_date')
+      <p style="color: var(--rose); font-size: var(--text-sm); margin-top: var(--s2)">{{ $message }}</p>
+    @enderror
+  </div>
+
+  <div class="field">
     <label for="checkout-map">Pin delivery location on map</label>
+    <div class="checkout-map-search">
+      <input type="text" id="checkout-map-search" autocomplete="off"
+        placeholder="Search your address, e.g. Jl. Sudirman, Jakarta" />
+      <ul id="checkout-map-suggestions" class="checkout-map-suggestions" hidden></ul>
+    </div>
     <div id="checkout-map" class="checkout-map" data-lat="{{ old('latitude') }}" data-lng="{{ old('longitude') }}"></div>
     <p id="checkout-map-status" class="checkout-map-status" data-state="{{ old('latitude') ? 'picked' : 'empty' }}">
       @if(old('latitude'))
@@ -84,6 +102,16 @@
   </div>
 
   <div class="field">
+    <label class="checkout-insurance-option" style="display:flex; align-items:flex-start; gap: var(--s3); cursor:pointer; margin:0">
+      <input type="checkbox" id="co-insurance" name="has_insurance" value="1" data-fee="{{ (int) $insuranceFee }}" @checked(old('has_insurance')) style="margin-top: 3px" />
+      <span>
+        <strong>Add shipping insurance</strong> — {{ rupiah($insuranceFee) }}
+        <br /><span style="color: var(--fg-soft); font-size: var(--text-sm)">Covers your order if it's lost or damaged in transit. Applies to the whole order, chosen here at checkout.</span>
+      </span>
+    </label>
+  </div>
+
+  <div class="field">
     <label>Payment method</label>
     <div class="payment-methods">
       <label class="payment-method-option">
@@ -105,11 +133,7 @@
         <div><span>Account no.</span><strong>{{ $settings['payment_bank_account_number'] ?? '—' }}</strong></div>
         <div><span>Account holder</span><strong>{{ $settings['payment_bank_account_holder'] ?? '—' }}</strong></div>
       </div>
-      <label for="co-payment-proof" style="margin-top: var(--s4); display:block">Upload transfer proof</label>
-      <input id="co-payment-proof" name="payment_proof" type="file" accept="image/*" />
-      @error('payment_proof')
-        <p style="color: var(--rose); font-size: var(--text-sm); margin-top: var(--s2)">{{ $message }}</p>
-      @enderror
+      <p style="margin-top: var(--s4); font-size: var(--text-sm); color: var(--fg-soft)">You'll upload your transfer proof after placing the order.</p>
     </div>
 
     <div id="payment-qris" class="payment-panel" style="display:none">

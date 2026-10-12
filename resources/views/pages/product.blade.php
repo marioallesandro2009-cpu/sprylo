@@ -6,3 +6,4 @@
 @section('content')
     @include('partials.product-body')
 @endsection
+

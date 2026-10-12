@@ -8,23 +8,27 @@ use Illuminate\Support\Str;
 
 class Order extends Model
 {
-    public const STATUSES = ['pending', 'paid', 'processing', 'shipped', 'completed', 'cancelled'];
+    public const STATUSES = ['awaiting_proof', 'pending', 'paid', 'processing', 'shipped', 'completed', 'cancelled'];
 
     protected $fillable = [
         'order_number', 'name', 'email', 'phone', 'address', 'city', 'postal_code', 'notes',
+        'requested_delivery_date',
         'latitude', 'longitude',
         'courier_code', 'courier_service_code', 'courier_name', 'courier_service_name', 'shipping_duration',
-        'subtotal', 'shipping', 'tax', 'promo_code', 'promo_discount', 'total', 'status',
+        'subtotal', 'shipping', 'tax', 'promo_code', 'promo_discount', 'has_insurance', 'insurance_fee', 'total', 'status',
         'payment_method', 'payment_proof_path',
     ];
 
     protected $casts = [
+        'requested_delivery_date' => 'date',
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'subtotal' => 'decimal:2',
         'shipping' => 'decimal:2',
         'tax' => 'decimal:2',
         'promo_discount' => 'decimal:2',
+        'has_insurance' => 'boolean',
+        'insurance_fee' => 'decimal:2',
         'total' => 'decimal:2',
     ];
 
@@ -41,6 +45,7 @@ class Order extends Model
     public function getStatusBadgeClassAttribute(): string
     {
         return match ($this->status) {
+            'awaiting_proof' => 'bg-secondary-subtle text-secondary',
             'pending' => 'bg-warning-subtle text-warning',
             'paid' => 'bg-info-subtle text-info',
             'processing' => 'bg-primary-subtle text-primary',
