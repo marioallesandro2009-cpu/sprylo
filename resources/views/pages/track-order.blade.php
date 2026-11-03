@@ -1,26 +1,20 @@
 @extends('layouts.app')
 
-@section('title', $pageMeta->title ?? ('Track your order — '.($settings['site_name'] ?? 'Sprylo')))
+@section('title', $pageMeta->title ?? ('Track your order — '.($settings['site_name'] ?? 'solis')))
 @section('meta_description', $pageMeta->meta_description ?? '')
 
 @section('content')
   <section class="page-head">
     <div class="container">
       <div class="crumbs"><a href="{{ route('home') }}">Home</a> <span class="sep">›</span> <span>Track order</span></div>
-      <h1>Track your order</h1>
-      <p>Enter your order number and email to check its status{{ $order && $order->payment_method === 'bank_transfer' ? ' or upload your transfer proof' : '' }}.</p>
+      <h1>{{ $settings['track_head_title'] ?? 'Track your order' }}</h1>
+      <p>{{ $settings['track_head_text'] ?? 'Enter your order number and email to check its status' }}{{ $order && $order->payment_method === 'bank_transfer' ? ' or upload your transfer proof' : '' }}.</p>
     </div>
   </section>
 
   <section class="section">
     <div class="container" style="max-width: 640px">
 
-      @if(session('success'))
-        <p style="color: var(--emerald); font-weight: 600; margin-bottom: var(--s5)">{{ session('success') }}</p>
-      @endif
-      @if(session('error'))
-        <p style="color: var(--rose); font-weight: 600; margin-bottom: var(--s5)">{{ session('error') }}</p>
-      @endif
       @isset($success)
         <p style="color: var(--emerald); font-weight: 600; margin-bottom: var(--s5)">{{ $success }}</p>
       @endisset
@@ -45,6 +39,7 @@
           <p style="color: var(--rose); font-size: var(--text-sm); margin-top: var(--s2)">{{ $message }}</p>
         @enderror
         <button type="submit" class="btn btn--indigo" style="margin-top: var(--s4)">Find my order →</button>
+        <p style="color: var(--fg-soft); font-size: var(--text-sm); margin-top: var(--s4)">Have an invoice to verify? <a href="{{ route('invoice-check.index') }}">Check your invoice</a></p>
       </form>
 
       @if($order)
@@ -86,11 +81,7 @@
               <p style="color: var(--fg-soft); font-size: var(--text-sm); margin-bottom: var(--s4)">
                 Please transfer {{ rupiah($order->total) }} to the account below, then upload your proof of payment.
               </p>
-              <div class="payment-bank-details">
-                <div><span>Bank</span><strong>{{ $settings['payment_bank_name'] ?? '—' }}</strong></div>
-                <div><span>Account no.</span><strong>{{ $settings['payment_bank_account_number'] ?? '—' }}</strong></div>
-                <div><span>Account holder</span><strong>{{ $settings['payment_bank_account_holder'] ?? '—' }}</strong></div>
-              </div>
+              @include('partials.bank-details')
 
               <form action="{{ route('track-order.payment-proof', $order) }}" method="POST" enctype="multipart/form-data" style="margin-top: var(--s5)">
                 @csrf
