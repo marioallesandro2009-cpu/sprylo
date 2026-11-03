@@ -39,7 +39,7 @@
           <p style="color: var(--rose); font-size: var(--text-sm); margin-top: var(--s2)">{{ $message }}</p>
         @enderror
         <button type="submit" class="btn btn--indigo" style="margin-top: var(--s4)">Find my order →</button>
-        <p style="color: var(--fg-soft); font-size: var(--text-sm); margin-top: var(--s4)">Have an invoice to verify? <a href="{{ route('invoice-check.index') }}">Check your invoice</a></p>
+        <p style="color: var(--fg-soft); font-size: var(--text-sm); margin-top: var(--s4)">Have an invoice to verify? <a href="{{ route('invoice-check.index') }}" style="color: var(--indigo); text-decoration: underline">Check your invoice</a></p>
       </form>
 
       @if($order)
