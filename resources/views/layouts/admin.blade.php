@@ -1,124 +1,139 @@
+@php
+  $siteName = $settings['site_name'] ?? 'solis';
+  $adminUser = auth()->user();
+
+  // Satu sumber untuk menu sidebar, jadi tidak ada lagi item dobel.
+  $menu = [
+    ['type' => 'link', 'label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'admin.dashboard', 'match' => ['admin.dashboard']],
+    ['type' => 'group', 'id' => 'pesanan', 'label' => 'Pesanan', 'icon' => 'fa-cart-shopping', 'items' => [
+      ['Semua Pesanan', 'admin.orders.index', ['admin.orders.*']],
+      ['Jadwal Kirim', 'admin.delivery-schedule.index', ['admin.delivery-schedule.*']],
+    ]],
+    ['type' => 'group', 'id' => 'produk', 'label' => 'Produk', 'icon' => 'fa-box', 'items' => [
+      ['Semua Produk', 'admin.products.index', ['admin.products.*']],
+      ['Kategori', 'admin.categories.index', ['admin.categories.*']],
+      ['Brand', 'admin.brands.index', ['admin.brands.*']],
+      ['Ulasan', 'admin.reviews.index', ['admin.reviews.*']],
+    ]],
+    ['type' => 'group', 'id' => 'promo', 'label' => 'Promo', 'icon' => 'fa-tag', 'items' => [
+      ['Kode Promo', 'admin.promo-codes.index', ['admin.promo-codes.*']],
+      ['Diskon Terjadwal', 'admin.discounts.index', ['admin.discounts.*']],
+      ['Flash Sale', 'admin.flash-sales.index', ['admin.flash-sales.*']],
+      ['Voucher Otomatis', 'admin.voucher-rules.index', ['admin.voucher-rules.*']],
+      ['Banner Promo', 'admin.promo-banners.index', ['admin.promo-banners.*']],
+    ]],
+    ['type' => 'group', 'id' => 'pelanggan', 'label' => 'Pelanggan', 'icon' => 'fa-user-group', 'items' => [
+      ['Semua Pelanggan', 'admin.users.index', ['admin.users.*']],
+      ['Pesan Kontak', 'admin.contact-messages.index', ['admin.contact-messages.*'], $unreadMessagesCount ?? 0],
+      ['Ditangguhkan', 'admin.suspended-customers.index', ['admin.suspended-customers.*']],
+      ['Newsletter', 'admin.newsletter-subscribers.index', ['admin.newsletter-subscribers.*']],
+    ]],
+    ['type' => 'group', 'id' => 'konten', 'label' => 'Konten', 'icon' => 'fa-pen-to-square', 'items' => [
+      ['Hero Slide', 'admin.hero-slides.index', ['admin.hero-slides.*']],
+      ['Navigasi', 'admin.nav-links.index', ['admin.nav-links.*']],
+      ['Footer', 'admin.footer-links.index', ['admin.footer-links.*']],
+      ['FAQ', 'admin.faqs.index', ['admin.faqs.*']],
+      ['Konten Halaman', 'admin.content.index', ['admin.content.*']],
+      ['Teks Halaman', 'admin.ui-texts.index', ['admin.ui-texts.*']],
+      ['SEO Halaman', 'admin.page-meta.index', ['admin.page-meta.*']],
+    ]],
+    ['type' => 'group', 'id' => 'pengaturan', 'label' => 'Pengaturan', 'icon' => 'fa-gear', 'items' => array_values(array_filter([
+      ['Pengaturan Toko', 'admin.settings.index', ['admin.settings.*']],
+      $adminUser->isSuperAdmin() ? ['Akun Admin', 'admin.admin-users.index', ['admin.admin-users.*']] : null,
+      $adminUser->isSuperAdmin() ? ['Log Audit', 'admin.audit-logs.index', ['admin.audit-logs.*']] : null,
+    ]))],
+  ];
+@endphp
 <!doctype html>
-<html lang="en">
+<html lang="id" class="theme-admin" data-theme="indigo">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
-  <title>@yield('title', 'Dashboard') — {{ $settings['site_name'] ?? 'Sprylo' }} Admin</title>
-  @if(!empty($settings['favicon']))
-    <link rel="icon" href="{{ $settings['favicon'] }}" />
-  @endif
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <title>@yield('title', 'Dashboard') — {{ $siteName }} Admin</title>
+  <link rel="icon" href="{{ !empty($settings['favicon']) ? $settings['favicon'] : asset('favicon.svg') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <style>
-    :root { --indigo: #4F46E5; --indigo-dark: #3730A3; --ink: #0F172A; }
-    body { font-family: 'Outfit', sans-serif; background: #F5F6FA; }
-    .admin-sidebar { width: 260px; min-height: 100vh; background: var(--ink); position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 1040; }
-    .admin-brand { padding: 20px 22px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 10px; }
-    .admin-brand .bico { width: 38px; height: 38px; border-radius: 10px; background: var(--indigo); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; }
-    .admin-brand .bname { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.05rem; font-weight: 800; color: #fff; }
-    .admin-brand .bsub { font-size: .65rem; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,.4); }
-    .admin-nav-section { color: rgba(255,255,255,.32); font-size: .68rem; text-transform: uppercase; letter-spacing: 1px; padding: 18px 22px 6px; font-weight: 600; }
-    .admin-nav-link { color: rgba(255,255,255,.7); padding: 10px 22px; font-size: .85rem; display: flex; align-items: center; gap: 10px; transition: .2s; border-left: 3px solid transparent; text-decoration: none; }
-    .admin-nav-link:hover { background: rgba(79,70,229,.15); color: #fff; }
-    .admin-nav-link.active { background: rgba(79,70,229,.22); color: #fff; border-left-color: var(--indigo); font-weight: 600; }
-    .admin-nav-link i { width: 16px; text-align: center; font-size: .8rem; }
-    .admin-nav-link.is-disabled { color: rgba(255,255,255,.32); cursor: default; }
-    .admin-nav-link .soon { margin-left: auto; font-size: .6rem; background: rgba(255,255,255,.08); padding: 2px 7px; border-radius: 999px; letter-spacing: .5px; }
-    .admin-main { margin-left: 260px; min-height: 100vh; }
-    .admin-topbar { background: #fff; padding: 14px 26px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 12px rgba(0,0,0,.05); position: sticky; top: 0; z-index: 1030; }
-    .admin-topbar h5 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; margin: 0; color: var(--ink); }
-    .admin-content { padding: 26px; }
-    .card-admin { background: #fff; border-radius: 14px; padding: 22px; box-shadow: 0 4px 16px rgba(0,0,0,.05); border: none; }
-    .btn-admin-primary { background: var(--indigo); color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-weight: 600; font-size: .85rem; }
-    .btn-admin-primary:hover { background: var(--indigo-dark); color: #fff; }
-    .table-admin thead { background: #F5F6FA; }
-    .table-admin th { font-size: .72rem; text-transform: uppercase; letter-spacing: .5px; color: #888; font-weight: 600; }
-    @media (max-width: 991px) {
-      .admin-sidebar { transform: translateX(-100%); transition: .3s; }
-      .admin-sidebar.show { transform: translateX(0); }
-      .admin-main { margin-left: 0; }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css" />
+  <link rel="stylesheet" href="{{ asset('assets/css/swal-theme.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/css/themes.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}" />
   @stack('styles')
 </head>
 <body>
+  <script>try { if (localStorage.getItem('adminSidebarCollapsed') === '1') document.body.classList.add('sb-collapsed'); } catch (e) {}</script>
 
-  @php $siteName = $settings['site_name'] ?? 'Sprylo'; @endphp
-
-  <div class="admin-sidebar" id="adminSidebar">
-    <div class="admin-brand">
-      @if(!empty($settings['logo']))
-        <img class="bico" src="{{ $settings['logo'] }}" alt="{{ $siteName }}" style="object-fit:cover" />
-      @else
-        <div class="bico">{{ strtoupper(substr($siteName, 0, 1)) }}</div>
-      @endif
-      <div>
-        <div class="bname">{{ $siteName }}</div>
-        <div class="bsub">Admin Panel</div>
-      </div>
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sb-head">
+      <a href="{{ route('admin.dashboard') }}" class="sb-brand">
+        <img src="{{ !empty($settings['logo']) ? $settings['logo'] : asset('assets/img/logo.svg') }}" alt="" />
+        <span class="txt">{{ $siteName }}<small>Admin Panel</small></span>
+      </a>
+      <button type="button" class="sb-collapse" id="sbCollapse" aria-label="Ciutkan sidebar"><i class="fa-solid fa-angles-left"></i></button>
     </div>
-    <nav class="py-2">
-      <a href="{{ route('admin.dashboard') }}" class="admin-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-        <i class="fa-solid fa-gauge"></i> Dashboard
-      </a>
 
-      <div class="admin-nav-section">Catalog</div>
-      <a href="{{ route('admin.products.index') }}" class="admin-nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"><i class="fa-solid fa-box"></i> Products</a>
-      <a href="{{ route('admin.categories.index') }}" class="admin-nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><i class="fa-solid fa-tags"></i> Categories</a>
-      <a href="{{ route('admin.brands.index') }}" class="admin-nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}"><i class="fa-solid fa-copyright"></i> Brands</a>
-      <a href="{{ route('admin.reviews.index') }}" class="admin-nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}"><i class="fa-solid fa-star"></i> Reviews</a>
-      <a href="{{ route('admin.promo-codes.index') }}" class="admin-nav-link {{ request()->routeIs('admin.promo-codes.*') ? 'active' : '' }}"><i class="fa-solid fa-percent"></i> Promo Codes</a>
-
-      <div class="admin-nav-section">Content</div>
-      <a href="{{ route('admin.orders.index') }}" class="admin-nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"><i class="fa-solid fa-receipt"></i> Orders</a>
-      <a href="{{ route('admin.contact-messages.index') }}" class="admin-nav-link {{ request()->routeIs('admin.contact-messages.*') ? 'active' : '' }}">
-        <i class="fa-solid fa-envelope"></i> Contact Messages
-        @if(($unreadMessagesCount ?? 0) > 0)
-          <span class="soon" style="background:#4F46E5">{{ $unreadMessagesCount }}</span>
+    <nav class="sb-nav" id="sbNav">
+      @foreach($menu as $entry)
+        @if($entry['type'] === 'link')
+          @php $on = request()->routeIs(...$entry['match']); @endphp
+          <a href="{{ route($entry['route']) }}" class="sb-link {{ $on ? 'active' : '' }}" title="{{ $entry['label'] }}">
+            <i class="fa-solid {{ $entry['icon'] }} ico"></i><span class="sb-txt">{{ $entry['label'] }}</span>
+          </a>
+        @else
+          @php
+            $open = collect($entry['items'])->contains(fn ($item) => request()->routeIs(...$item[2]));
+            $badge = collect($entry['items'])->sum(fn ($item) => $item[3] ?? 0);
+          @endphp
+          <button type="button" class="sb-link {{ $open ? 'group-active' : '' }}" data-bs-toggle="collapse" data-bs-target="#grp-{{ $entry['id'] }}" aria-expanded="{{ $open ? 'true' : 'false' }}" title="{{ $entry['label'] }}">
+            <i class="fa-solid {{ $entry['icon'] }} ico"></i><span class="sb-txt">{{ $entry['label'] }}</span>
+            @if($badge > 0)<span class="sb-count sb-txt ms-auto me-1">{{ $badge }}</span>@endif
+            <i class="fa-solid fa-chevron-down sb-chevron" @if($badge > 0) style="margin-left:0" @endif></i>
+          </button>
+          {{-- data-bs-parent: opening one group closes the others, so the menu stays short. --}}
+          <div class="collapse sb-sub {{ $open ? 'show' : '' }}" id="grp-{{ $entry['id'] }}" data-bs-parent="#sbNav">
+            @foreach($entry['items'] as $item)
+              <a href="{{ route($item[1]) }}" class="{{ request()->routeIs(...$item[2]) ? 'active' : '' }}">
+                <span>{{ $item[0] }}</span>
+                @if(($item[3] ?? 0) > 0)<span class="sb-count">{{ $item[3] }}</span>@endif
+              </a>
+            @endforeach
+          </div>
         @endif
-      </a>
-      <a href="{{ route('admin.faqs.index') }}" class="admin-nav-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}"><i class="fa-solid fa-circle-question"></i> FAQs</a>
-      <a href="{{ route('admin.footer-links.index') }}" class="admin-nav-link {{ request()->routeIs('admin.footer-links.*') ? 'active' : '' }}"><i class="fa-solid fa-link"></i> Footer Links</a>
-      <a href="{{ route('admin.hero-slides.index') }}" class="admin-nav-link {{ request()->routeIs('admin.hero-slides.*') ? 'active' : '' }}"><i class="fa-solid fa-images"></i> Hero Slides</a>
-      <a href="{{ route('admin.promo-banners.index') }}" class="admin-nav-link {{ request()->routeIs('admin.promo-banners.*') ? 'active' : '' }}"><i class="fa-solid fa-tag"></i> Promo Banners</a>
-
-      <div class="admin-nav-section">Customers</div>
-      <a href="{{ route('admin.users.index') }}" class="admin-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"><i class="fa-solid fa-users"></i> Users</a>
-      <a href="{{ route('admin.suspended-customers.index') }}" class="admin-nav-link {{ request()->routeIs('admin.suspended-customers.*') ? 'active' : '' }}"><i class="fa-solid fa-user-slash"></i> Suspended Customers</a>
-      <a href="{{ route('admin.newsletter-subscribers.index') }}" class="admin-nav-link {{ request()->routeIs('admin.newsletter-subscribers.*') ? 'active' : '' }}"><i class="fa-solid fa-paper-plane"></i> Newsletter</a>
-
-      <div class="admin-nav-section">Configuration</div>
-      <a href="{{ route('admin.content.index') }}" class="admin-nav-link {{ request()->routeIs('admin.content.*') ? 'active' : '' }}"><i class="fa-solid fa-pen-to-square"></i> Page Content</a>
-      <a href="{{ route('admin.settings.index') }}" class="admin-nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"><i class="fa-solid fa-gear"></i> Site Settings</a>
-      <a href="{{ route('admin.page-meta.index') }}" class="admin-nav-link {{ request()->routeIs('admin.page-meta.*') ? 'active' : '' }}"><i class="fa-solid fa-globe"></i> SEO / Page Meta</a>
-      <a href="{{ route('admin.account.edit') }}" class="admin-nav-link {{ request()->routeIs('admin.account.*') ? 'active' : '' }}"><i class="fa-solid fa-user"></i> My Account</a>
+      @endforeach
     </nav>
-  </div>
 
-  <div class="admin-main">
-    <div class="admin-topbar">
-      <button class="btn btn-sm btn-outline-secondary d-lg-none" onclick="document.getElementById('adminSidebar').classList.toggle('show')">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-      <h5>@yield('page-title', 'Dashboard')</h5>
-      <div class="d-flex align-items-center gap-3">
-        <a href="{{ route('admin.account.edit') }}" class="text-muted small text-decoration-none">{{ auth()->user()->name }}</a>
+    <div class="sb-foot">
+      <a href="{{ route('admin.account.edit') }}" class="sb-user" title="Akun saya">
+        <div class="sb-avatar">{{ strtoupper(mb_substr($adminUser->name, 0, 1)) }}</div>
+        <div class="meta"><div class="nm">{{ $adminUser->name }}</div></div>
+      </a>
+      <div class="sb-foot-actions">
+        <a href="{{ route('home') }}" target="_blank" rel="noopener" class="sb-icon-btn" title="Lihat Toko" aria-label="Lihat Toko"><i class="fa-solid fa-store"></i></a>
         <form method="POST" action="{{ route('admin.logout') }}">
           @csrf
-          <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-right-from-bracket"></i></button>
+          <button type="submit" class="sb-icon-btn" title="Keluar" aria-label="Keluar"><i class="fa-solid fa-right-from-bracket"></i></button>
         </form>
       </div>
     </div>
+  </aside>
+  <div class="sb-overlay" id="sbOverlay"></div>
+
+  <div class="admin-main">
+    <div class="m-topbar">
+      <button class="btn btn-sm btn-outline-secondary" type="button" id="sbOpen" aria-label="Buka menu"><i class="fa-solid fa-bars"></i></button>
+      <span class="t">@yield('page-title', 'Dashboard')</span>
+      <img src="{{ !empty($settings['logo']) ? $settings['logo'] : asset('assets/img/logo.svg') }}" alt="" />
+    </div>
 
     <div class="admin-content">
-      @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+      @hasSection('custom-header')
+        @yield('custom-header')
+      @else
+        <div class="page-head"><h1>@yield('page-title', 'Dashboard')</h1></div>
       @endif
-      @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-      @endif
+
+      <div id="flash-data" hidden data-success="{{ session('success') }}" data-error="{{ session('error') }}" data-warning="{{ session('warning') }}"></div>
       @if($errors->any())
         <div class="alert alert-danger">
           <ul class="mb-0">
@@ -134,6 +149,25 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"></script>
+  <script src="{{ asset('assets/js/swal-helpers.js') }}"></script>
+  <script>
+    (function () {
+      var sidebar = document.getElementById('adminSidebar');
+      var overlay = document.getElementById('sbOverlay');
+      var close = function () { sidebar.classList.remove('show'); overlay.classList.remove('show'); };
+
+      document.getElementById('sbCollapse').addEventListener('click', function () {
+        var collapsed = document.body.classList.toggle('sb-collapsed');
+        try { localStorage.setItem('adminSidebarCollapsed', collapsed ? '1' : '0'); } catch (e) {}
+      });
+      document.getElementById('sbOpen').addEventListener('click', function () {
+        sidebar.classList.add('show');
+        overlay.classList.add('show');
+      });
+      overlay.addEventListener('click', close);
+    })();
+  </script>
   @stack('scripts')
 </body>
 </html>

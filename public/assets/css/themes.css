@@ -1,0 +1,50 @@
+/* Page colour grading.
+ *
+ * Every page picks one accent hue via <html data-theme="…">. Neutrals (white, slate text, borders) never change,
+ * so the site stays clean and recognisably solis; only the accent family — buttons, links, focus rings, tints —
+ * shifts from section to section. All "main" values meet WCAG AA (4.5:1) for white text / text on white.
+ *
+ * --t-main  accent (buttons, links)      --t-deep  hover / headings on tint
+ * --t-mid   lighter accent for gradients --t-soft  very light tint   --t-line  tinted border   --t-rgb  for rgba()
+ */
+:root {
+  --t-main: #4F46E5; --t-deep: #3730A3; --t-mid: #6366F1; --t-soft: #EEF2FF; --t-line: #C7D2FE; --t-rgb: 79, 70, 229;
+}
+html[data-theme="indigo"]  { --t-main: #4F46E5; --t-deep: #3730A3; --t-mid: #6366F1; --t-soft: #EEF2FF; --t-line: #C7D2FE; --t-rgb: 79, 70, 229; }
+html[data-theme="violet"]  { --t-main: #6D28D9; --t-deep: #5B21B6; --t-mid: #8B5CF6; --t-soft: #F5F3FF; --t-line: #DDD6FE; --t-rgb: 109, 40, 217; }
+html[data-theme="blue"]    { --t-main: #1D4ED8; --t-deep: #1E40AF; --t-mid: #3B82F6; --t-soft: #EFF6FF; --t-line: #BFDBFE; --t-rgb: 29, 78, 216; }
+html[data-theme="sky"]     { --t-main: #0369A1; --t-deep: #075985; --t-mid: #0EA5E9; --t-soft: #F0F9FF; --t-line: #BAE6FD; --t-rgb: 3, 105, 161; }
+html[data-theme="cyan"]    { --t-main: #0E7490; --t-deep: #155E75; --t-mid: #06B6D4; --t-soft: #ECFEFF; --t-line: #A5F3FC; --t-rgb: 14, 116, 144; }
+html[data-theme="teal"]    { --t-main: #0F766E; --t-deep: #115E59; --t-mid: #14B8A6; --t-soft: #F0FDFA; --t-line: #99F6E4; --t-rgb: 15, 118, 110; }
+html[data-theme="emerald"] { --t-main: #047857; --t-deep: #065F46; --t-mid: #10B981; --t-soft: #ECFDF5; --t-line: #A7F3D0; --t-rgb: 4, 120, 87; }
+html[data-theme="amber"]   { --t-main: #B45309; --t-deep: #92400E; --t-mid: #F59E0B; --t-soft: #FFFBEB; --t-line: #FDE68A; --t-rgb: 180, 83, 9; }
+html[data-theme="orange"]  { --t-main: #C2410C; --t-deep: #9A3412; --t-mid: #F97316; --t-soft: #FFF7ED; --t-line: #FED7AA; --t-rgb: 194, 65, 12; }
+html[data-theme="pink"]    { --t-main: #BE185D; --t-deep: #9D174D; --t-mid: #EC4899; --t-soft: #FDF2F8; --t-line: #FBCFE8; --t-rgb: 190, 24, 93; }
+html[data-theme="slate"]   { --t-main: #475569; --t-deep: #334155; --t-mid: #64748B; --t-soft: #F1F5F9; --t-line: #CBD5E1; --t-rgb: 71, 85, 105; }
+
+/* Storefront: the existing --indigo / --accent tokens now follow the page theme. */
+html.theme-store:root {
+  --indigo: var(--t-main); --indigo-deep: var(--t-deep); --indigo-soft: var(--t-soft); --indigo-line: var(--t-line);
+  --accent: var(--t-main); --accent-deep: var(--t-deep); --accent-soft: var(--t-soft);
+  --shadow-indigo: 0 12px 28px -10px rgba(var(--t-rgb), 0.35);
+}
+
+/* Inner-page header: a soft wash of the page's hue instead of flat white. */
+html.theme-store .page-head {
+  background:
+    radial-gradient(760px 240px at 88% -30%, rgba(var(--t-rgb), 0.14), transparent 70%),
+    linear-gradient(180deg, var(--t-soft), var(--paper) 92%);
+  border-bottom-color: var(--t-line);
+}
+html.theme-store .page-head h1 { color: var(--ink); }
+html.theme-store .page-head .crumbs a:hover { color: var(--t-main); }
+
+/* Admin: one accent everywhere (layouts/admin sets data-theme="indigo"); the --brand tokens read it from here. */
+html.theme-admin:root {
+  --brand: var(--t-main); --brand-deep: var(--t-deep); --brand-mid: var(--t-mid); --brand-soft: var(--t-soft); --brand-line: var(--t-line);
+  --indigo: var(--t-main); --indigo-dark: var(--t-deep);
+  --ring: 0 0 0 3px rgba(var(--t-rgb), .22);
+  --bs-primary: var(--t-main); --bs-primary-rgb: var(--t-rgb);
+  --bs-link-color: var(--t-main); --bs-link-hover-color: var(--t-deep);
+  --bs-link-color-rgb: var(--t-rgb);
+}
