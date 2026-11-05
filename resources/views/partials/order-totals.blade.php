@@ -12,11 +12,11 @@
   <span>Shipping @if($order->courier_name)({{ $order->courier_name }} — {{ $order->courier_service_name }})@endif</span>
   <span>{{ $order->shipping == 0.0 ? 'Free' : rupiah($order->shipping) }}</span>
 </div>
-<div class="cart-line"><span>Tax</span><span>{{ rupiah($order->tax) }}</span></div>
 @if($order->has_insurance)
   <div class="cart-line"><span>Shipping insurance</span><span>{{ rupiah($order->insurance_fee) }}</span></div>
 @endif
 @if($order->promo_discount > 0)
   <div class="cart-line"><span>Promo · {{ $order->promo_code }}</span><span>−{{ rupiah($order->promo_discount) }}</span></div>
 @endif
+<div class="cart-line"><span>{{ $order->tax_label }}</span><span>{{ rupiah($order->tax) }}</span></div>
 <div class="cart-line is-total"><span>Total</span><span>{{ rupiah($order->total) }}</span></div>

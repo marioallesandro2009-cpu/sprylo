@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\Auditable;
+use App\Support\Cart;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
@@ -51,6 +52,25 @@ class Order extends Model
         }
 
         return asset(ltrim((string) parse_url($this->payment_proof_path, PHP_URL_PATH), '/'));
+    }
+
+    /**
+     * The tax line's name. Orders keep the tax they were placed with, so one from before PPN 12% (8% of the
+     * subtotal) still says what it actually charged.
+     */
+    public function getTaxLabelAttribute(): string
+    {
+        $tax = (float) $this->tax;
+        $subtotal = (float) $this->subtotal;
+        $taxable = max($subtotal - (float) $this->promo_discount, 0);
+
+        if ($tax > 0 && $tax === round($taxable * Cart::PPN_PERCENT / 100)) {
+            return 'PPN '.Cart::PPN_PERCENT.'%';
+        }
+
+        $rate = $subtotal > 0 ? round($tax / $subtotal * 100, 1) : 0;
+
+        return $rate > 0 ? 'Tax ('.(float) $rate.'%)' : 'Tax';
     }
 
     public function getRouteKeyName(): string

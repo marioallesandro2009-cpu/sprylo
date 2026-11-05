@@ -120,8 +120,7 @@
         @if($order->has_insurance && (float) $order->insurance_fee > 0)
           <tr><td class="muted">Shipping insurance</td><td class="right">{{ rupiah($order->insurance_fee) }}</td></tr>
         @endif
-        @php $taxRate = (float) $order->subtotal > 0 ? round((float) $order->tax / (float) $order->subtotal * 100, 1) : 0; @endphp
-        <tr><td class="muted">Tax{{ $taxRate > 0 ? ' ('.rtrim(rtrim(number_format($taxRate, 1, '.', ''), '0'), '.').'%)' : '' }}</td><td class="right">{{ rupiah($order->tax) }}</td></tr>
+        <tr><td class="muted">{{ $order->tax_label }}</td><td class="right">{{ rupiah($order->tax) }}</td></tr>
         <tr class="grand"><td>Total</td><td class="right">{{ rupiah($order->total) }}</td></tr>
       </table>
     </td>

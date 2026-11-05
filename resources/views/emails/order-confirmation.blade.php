@@ -11,7 +11,7 @@
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; background:#ffffff; border-radius:12px; overflow:hidden; border:1px solid #e4e4e7;">
           <tr>
             <td style="padding:28px 32px; background:#4338ca; color:#ffffff;">
-              <div style="font-size:13px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.8;">Sprylo</div>
+              <div style="font-size:13px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.8;">{{ config('app.name') }}</div>
               <div style="font-size:20px; font-weight:700; margin-top:4px;">Thanks for your order!</div>
             </td>
           </tr>
@@ -40,13 +40,13 @@
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px; color:#52525b; border-top:1px solid #e4e4e7; padding-top:12px;">
                 <tr><td style="padding:4px 0;">Subtotal</td><td style="padding:4px 0; text-align:right;">{{ rupiah($order->subtotal) }}</td></tr>
                 <tr><td style="padding:4px 0;">Shipping</td><td style="padding:4px 0; text-align:right;">{{ $order->shipping == 0.0 ? 'Free' : rupiah($order->shipping) }}</td></tr>
-                <tr><td style="padding:4px 0;">Tax</td><td style="padding:4px 0; text-align:right;">{{ rupiah($order->tax) }}</td></tr>
                 @if($order->has_insurance)
                   <tr><td style="padding:4px 0;">Shipping insurance</td><td style="padding:4px 0; text-align:right;">{{ rupiah($order->insurance_fee) }}</td></tr>
                 @endif
                 @if($order->promo_discount > 0)
                   <tr><td style="padding:4px 0;">Promo ({{ $order->promo_code }})</td><td style="padding:4px 0; text-align:right;">−{{ rupiah($order->promo_discount) }}</td></tr>
                 @endif
+                <tr><td style="padding:4px 0;">{{ $order->tax_label }}</td><td style="padding:4px 0; text-align:right;">{{ rupiah($order->tax) }}</td></tr>
                 <tr><td style="padding:8px 0 0; font-weight:700; color:#18181b; font-size:15px;">Total</td><td style="padding:8px 0 0; text-align:right; font-weight:700; color:#18181b; font-size:15px;">{{ rupiah($order->total) }}</td></tr>
               </table>
 
@@ -55,7 +55,7 @@
                 <div style="font-size:14px; font-weight:600;">{{ $order->name }}</div>
                 <div style="font-size:13px; color:#52525b; line-height:1.5;">{{ $order->address }}<br>{{ $order->city }}, {{ $order->postal_code }}</div>
                 @if($order->requested_delivery_date)
-                  <div style="font-size:13px; color:#52525b; margin-top:8px;">Requested delivery: {{ $order->requested_delivery_date->format('d M Y') }}</div>
+                  <div style="font-size:13px; color:#52525b; margin-top:8px;">Requested delivery: {{ $order->delivery_schedule }}</div>
                 @endif
               </div>
             </td>

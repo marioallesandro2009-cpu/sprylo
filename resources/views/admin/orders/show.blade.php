@@ -5,8 +5,15 @@
 
 @section('content')
 
-  <div class="mb-3">
+  <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
     <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i> Back to orders</a>
+    @if($order->status !== 'cancelled')
+      <span class="ms-auto d-inline-flex gap-2 align-items-center">
+        @if($order->invoice_number)<span class="text-muted small">Invoice <strong>{{ $order->invoice_number }}</strong></span>@endif
+        <a href="{{ route('admin.orders.invoice', $order) }}" target="_blank" rel="noopener" class="btn btn-sm btn-admin-primary"><i class="fa-solid fa-file-invoice me-1"></i> {{ $order->invoice_number ? 'View invoice' : 'Generate invoice' }} (PDF)</a>
+        <a href="{{ route('admin.orders.invoice', [$order, 'download' => 1]) }}" class="btn btn-sm btn-outline-secondary" title="Download PDF"><i class="fa-solid fa-download"></i></a>
+      </span>
+    @endif
   </div>
 
   <div class="card-admin mb-3" style="max-width:720px">
@@ -61,9 +68,9 @@
       </div>
       @if($order->requested_delivery_date)
         <div class="col-md-6">
-          <div class="text-muted small">Requested delivery date</div>
+          <div class="text-muted small">Requested delivery schedule</div>
           <div class="fw-semibold">
-            {{ $order->requested_delivery_date->format('d M Y') }}
+            {{ $order->delivery_schedule }}
             @if($order->requested_delivery_date->isToday() || $order->requested_delivery_date->isTomorrow())
               <span class="badge bg-warning-subtle text-warning-emphasis">Coming up soon</span>
             @endif
@@ -75,7 +82,7 @@
         <div class="fw-semibold text-capitalize">
           {{ $order->payment_method ? str_replace('_', ' ', $order->payment_method) : '—' }}
           @if($order->payment_proof_path)
-            · <a href="{{ $order->payment_proof_path }}" target="_blank" rel="noopener">view proof</a>
+            · <a href="{{ $order->payment_proof_url }}" target="_blank" rel="noopener">view proof</a>
           @endif
         </div>
       </div>
@@ -119,13 +126,13 @@
     <div class="d-flex flex-column align-items-end gap-1">
       <div class="text-muted small">Subtotal: {{ rupiah($order->subtotal) }}</div>
       <div class="text-muted small">Shipping: {{ $order->shipping == 0.0 ? 'Free' : rupiah($order->shipping) }}</div>
-      <div class="text-muted small">Tax: {{ rupiah($order->tax) }}</div>
       @if($order->has_insurance)
         <div class="text-muted small">Shipping insurance: {{ rupiah($order->insurance_fee) }}</div>
       @endif
       @if($order->promo_discount > 0)
         <div class="text-muted small">Promo ({{ $order->promo_code }}): −{{ rupiah($order->promo_discount) }}</div>
       @endif
+      <div class="text-muted small">{{ $order->tax_label }}: {{ rupiah($order->tax) }}</div>
       <div class="fw-bold fs-5">Total: {{ rupiah($order->total) }}</div>
     </div>
   </div>
@@ -147,7 +154,7 @@
   </div>
 
   <div class="mt-3">
-    <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Delete this order?');">
+    <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" data-confirm="Delete this order?">
       @csrf @method('DELETE')
       <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Delete order</button>
     </form>

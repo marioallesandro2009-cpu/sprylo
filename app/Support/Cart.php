@@ -9,6 +9,9 @@ use Illuminate\Support\Collection;
 
 class Cart
 {
+    /** PPN, charged on the goods after any promo. Shipping and shipping insurance are not taxed. */
+    public const PPN_PERCENT = 12;
+
     /**
      * Cart entries are keyed "{productId}" or "{productId}:{variantId}" so a product with
      * variants can sit in the cart multiple times — once per variant chosen.
@@ -43,7 +46,8 @@ class Cart
                 $parsed = static::parseKey($key);
                 $product = $products->get($parsed['product_id']);
 
-                if (! $product) {
+                // A product the admin has since deactivated drops out of the cart instead of being purchasable.
+                if (! $product || ! $product->is_active) {
                     return null;
                 }
 
@@ -53,7 +57,9 @@ class Cart
                     return null;
                 }
 
-                $unitPrice = $variant ? ($variant->sale_price ?? $variant->price) : ($product->sale_price ?? $product->price);
+                $priced = $variant ?? $product;
+                $unitPrice = $priced->sale_price ?? $priced->price;
+                $discount = $priced->promo;
                 $stock = $variant ? $variant->stock : $product->stock;
                 $weight = $variant ? $variant->weight : $product->weight;
 
@@ -65,6 +71,9 @@ class Cart
                     'unit_price' => $unitPrice,
                     'subtotal' => $unitPrice * $qty,
                     'stock' => $stock,
+                    'discount_id' => $discount?->id,
+                    'discount' => $discount,
+                    'discount_remaining' => $discount?->remaining,
                     'weight' => $weight,
                     'has_warranty' => (bool) $variant?->has_warranty,
                 ];
@@ -79,7 +88,6 @@ class Cart
         $freeThreshold = (float) (Setting::where('key', 'shipping_free_threshold')->value('value') ?? 750000);
         $shippingFee = (float) (Setting::where('key', 'shipping_fee')->value('value') ?? 25000);
         $shipping = ($subtotal > 0 && $subtotal < $freeThreshold) ? $shippingFee : 0.0;
-        $tax = round($subtotal * 0.08);
 
         $promoCode = null;
         $promoDiscount = 0.0;
@@ -92,6 +100,8 @@ class Cart
                 $promoDiscount = $promo->discountFor($subtotal);
             }
         }
+
+        $tax = round(max($subtotal - $promoDiscount, 0) * self::PPN_PERCENT / 100);
 
         return [
             'subtotal' => $subtotal,
