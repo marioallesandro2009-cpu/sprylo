@@ -1,8 +1,8 @@
 @if($relatedProducts->isNotEmpty())
   <section class="section">
     <div class="section-head">
-      <h2>You may also like</h2>
-      <a href="{{ route('shop.index') }}" class="view-all">All products →</a>
+      <h2>{{ $ui('ui_related_title') }}</h2>
+      <a href="{{ route('shop.index') }}" class="view-all">{{ $ui('ui_related_view_all') }}</a>
     </div>
     <div class="products">
       @foreach($relatedProducts as $related)

@@ -1,5 +1,5 @@
 <div>
-  <h2 style="font-size: var(--text-2xl); margin-bottom: var(--s5)">Specifications</h2>
+  <h2 style="font-size: var(--text-2xl); margin-bottom: var(--s5)">{{ $ui('ui_specs_title') }}</h2>
   <table style="width:100%; border-collapse: collapse; font-size: var(--text-sm)">
     <tbody>
       @foreach($specs as $spec)

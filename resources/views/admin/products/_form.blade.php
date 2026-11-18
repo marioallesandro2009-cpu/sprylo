@@ -6,7 +6,7 @@
       'label' => $v->label,
       'sku' => $v->sku,
       'price' => (string) $v->price,
-      'sale_price' => $v->sale_price !== null ? (string) $v->sale_price : '',
+      'sale_price' => $v->getRawOriginal('sale_price') !== null ? (string) $v->getRawOriginal('sale_price') : '',
       'has_warranty' => $v->has_warranty,
       'stock' => $v->stock,
       'weight' => $v->weight,
@@ -49,8 +49,8 @@
   </div>
   <div class="col-md-3">
     <label class="form-label small fw-semibold">Sale price (Rp)</label>
-    <input type="number" step="1000" min="0" name="sale_price" class="form-control" value="{{ old('sale_price', $product->sale_price ?? '') }}" />
-    <div class="form-text">Leave empty if not on sale.</div>
+    <input type="number" step="1000" min="0" name="sale_price" class="form-control" value="{{ old('sale_price', isset($product) ? $product->getRawOriginal('sale_price') : '') }}" />
+    <div class="form-text">Leave empty if not on sale. Scheduled discounts and flash sales are set under Kupon.</div>
   </div>
   <div class="col-md-3">
     <label class="form-label small fw-semibold">Stock</label>
@@ -215,11 +215,9 @@
         @foreach($product->images as $image)
           <div class="position-relative">
             <img src="{{ $image->image }}" alt="" style="width:76px;height:76px;object-fit:cover;border-radius:8px" />
-            <form action="{{ route('admin.products.images.destroy', [$product, $image]) }}" method="POST" onsubmit="return confirm('Remove this image?');"
-                  style="position:absolute; top:-8px; right:-8px">
-              @csrf @method('DELETE')
-              <button type="submit" class="btn btn-sm btn-danger rounded-circle" style="width:24px;height:24px;padding:0;line-height:1;font-size:.7rem">✕</button>
-            </form>
+            {{-- The delete form itself lives outside this form (see edit.blade.php): forms can't be nested, and a nested one made "remove image" delete the whole product. --}}
+            <button type="submit" form="delete-image-{{ $image->id }}" class="btn btn-sm btn-danger rounded-circle" aria-label="Remove this image"
+                    style="position:absolute; top:-8px; right:-8px; width:24px;height:24px;padding:0;line-height:1;font-size:.7rem">✕</button>
           </div>
         @endforeach
       </div>

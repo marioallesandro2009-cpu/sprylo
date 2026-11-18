@@ -12,6 +12,7 @@ class ProductController extends Controller
         $product = Product::withRatingStats()
             ->with(['images', 'category', 'brand', 'variants'])
             ->where('slug', $product)
+            ->where('is_active', true)
             ->firstOrFail();
 
         $specs = [

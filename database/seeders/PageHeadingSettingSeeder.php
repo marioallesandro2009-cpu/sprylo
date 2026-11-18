@@ -32,7 +32,7 @@ class PageHeadingSettingSeeder extends Seeder
 
         PageMeta::firstOrCreate(
             ['page_slug' => 'track-order'],
-            ['title' => 'Track your order — Sprylo', 'meta_description' => 'Check the status of your Sprylo order.']
+            ['title' => 'Track your order — solis', 'meta_description' => 'Check the status of your solis order.']
         );
     }
 }

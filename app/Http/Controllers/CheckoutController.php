@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmationMail;
+use App\Models\Discount;
 use App\Models\Order;
+use App\Models\PromoCode;
 use App\Models\PageMeta;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -11,6 +13,10 @@ use App\Models\Setting;
 use App\Models\SuspendedCustomer;
 use App\Services\BiteshipService;
 use App\Support\Cart;
+use App\Support\DeliverySlots;
+use App\Support\DiscountSync;
+use App\Support\StockLedger;
+use App\Support\VoucherIssuer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -157,6 +163,16 @@ class CheckoutController extends Controller
      * database — used as a fallback when Nominatim's reverse-geocode didn't return a postcode
      * for the pinned point.
      */
+    /** Time windows (with places left) for a delivery date, for the checkout slot picker. */
+    public function deliverySlots(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d', 'after:today', 'before_or_equal:'.now()->addDays(90)->toDateString()],
+        ]);
+
+        return response()->json(['date' => $data['date'], 'slots' => DeliverySlots::forDate($data['date'])]);
+    }
+
     public function postalLookup(Request $request, BiteshipService $biteship): JsonResponse
     {
         $data = $request->validate([
@@ -207,12 +223,16 @@ class CheckoutController extends Controller
             'postal_code' => ['required', 'string', 'max:20'],
             'notes' => ['nullable', 'string'],
             'requested_delivery_date' => ['nullable', 'date', 'after:today', 'before_or_equal:'.now()->addDays(90)->toDateString()],
+            'requested_delivery_slot' => ['nullable', 'required_with:requested_delivery_date', 'in:'.implode(',', DeliverySlots::keys())],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'courier_code' => ['nullable', 'string', 'max:100'],
             'courier_service_code' => ['nullable', 'string', 'max:100'],
             'payment_method' => ['required', 'string', 'in:bank_transfer,qris'],
             'has_insurance' => ['nullable', 'boolean'],
+        ], [
+            'requested_delivery_slot.required_with' => 'Please choose a time window for your delivery date.',
+            'requested_delivery_slot.in' => 'Please choose one of the available delivery time windows.',
         ]);
 
         // A signed-in shopper is blocked by their own account status, in case they were
@@ -289,6 +309,47 @@ class CheckoutController extends Controller
                 }
             }
 
+            // A delivery window only takes so many orders a day; count them under lock so two checkouts can't both take the last place.
+            if (! empty($data['requested_delivery_date']) && ! empty($data['requested_delivery_slot'])) {
+                $taken = Order::whereDate('requested_delivery_date', $data['requested_delivery_date'])
+                    ->where('requested_delivery_slot', $data['requested_delivery_slot'])
+                    ->where('status', '!=', 'cancelled')
+                    ->lockForUpdate()
+                    ->count();
+
+                if ($taken >= DeliverySlots::capacity()) {
+                    throw ValidationException::withMessages([
+                        'requested_delivery_slot' => 'Sorry, that delivery window just filled up. Please pick another time or date.',
+                    ]);
+                }
+            }
+
+            // A single-use voucher can only be spent once: re-check under lock, then count it.
+            if ($totals['promo_code']) {
+                $promo = PromoCode::where('code', $totals['promo_code'])->lockForUpdate()->first();
+
+                if ($promo && $promo->usage_limit !== null && $promo->used_count >= $promo->usage_limit) {
+                    throw ValidationException::withMessages(['promo' => 'That voucher has already been used. Please remove it from your cart and try again.']);
+                }
+
+                $promo?->increment('used_count');
+            }
+
+            // Flash-sale units are limited, so lock each discount row and make sure this order
+            // (summed across its lines) still fits in what's left of the quota.
+            $discountQty = $cartItems->filter(fn ($item) => $item['discount_id'])->groupBy('discount_id')->map(fn ($lines) => $lines->sum('qty'));
+            $lockedDiscounts = Discount::whereIn('id', $discountQty->keys())->lockForUpdate()->get()->keyBy('id');
+
+            foreach ($discountQty as $discountId => $qty) {
+                $discount = $lockedDiscounts->get($discountId);
+
+                if ($discount && $discount->quota !== null && $discount->sold + $qty > $discount->quota) {
+                    throw ValidationException::withMessages([
+                        'stock' => "Sorry, only {$discount->remaining} left in the \"{$discount->name}\" sale. Please update your cart and try again.",
+                    ]);
+                }
+            }
+
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
                 'name' => $data['name'],
@@ -299,6 +360,7 @@ class CheckoutController extends Controller
                 'postal_code' => $data['postal_code'],
                 'notes' => $data['notes'] ?? null,
                 'requested_delivery_date' => $data['requested_delivery_date'] ?? null,
+                'requested_delivery_slot' => ! empty($data['requested_delivery_date']) ? ($data['requested_delivery_slot'] ?? null) : null,
                 'latitude' => $data['latitude'],
                 'longitude' => $data['longitude'],
                 'courier_code' => $selectedCourier['courier_code'],
@@ -326,21 +388,43 @@ class CheckoutController extends Controller
                     'product_name' => $item['product']->name,
                     'variant_label' => $item['variant']?->label,
                     'has_warranty' => $item['has_warranty'],
+                    'discount_id' => $item['discount_id'],
                     'unit_price' => $item['unit_price'],
                     'qty' => $item['qty'],
                     'subtotal' => $item['subtotal'],
                 ]);
 
+                // update 1: stok berkurang karena pesanan masuk, dicatat di riwayat stok
                 if ($item['variant']) {
-                    ProductVariant::whereKey($item['variant']->id)->decrement('stock', $item['qty']);
+                    StockLedger::move($item['variant'], -$item['qty'], 'order', $order);
                     $item['product']->syncFromVariants();
                 } else {
-                    Product::whereKey($item['product']->id)->decrement('stock', $item['qty']);
+                    StockLedger::move($item['product'], -$item['qty'], 'order', $order);
                 }
+            }
+
+            foreach ($discountQty as $discountId => $qty) {
+                Discount::whereKey($discountId)->increment('sold', $qty);
             }
 
             return $order;
         });
+
+        // A flash sale that just sold its last unit has to stop discounting immediately.
+        if (Discount::whereIn('id', $order->items->pluck('discount_id')->filter())->whereNotNull('quota')->exists()) {
+            DiscountSync::run();
+        }
+
+        // Vouchers earned by this order (first order, loyalty milestones) — emailed and shown on the confirmation page.
+        try {
+            $earned = VoucherIssuer::afterOrder($order);
+
+            if ($earned->isNotEmpty()) {
+                session(['earned_vouchers' => $earned->pluck('code')->all()]);
+            }
+        } catch (Throwable $e) {
+            report($e);
+        }
 
         Cart::clear();
         session(['last_order_id' => $order->id]);
@@ -361,7 +445,10 @@ class CheckoutController extends Controller
         // anyone else is sent through track-order, which verifies the order's email first.
         $canUploadProof = (int) session('last_order_id') === $order->id;
 
-        return view('pages.checkout-confirmation', compact('order', 'canUploadProof'));
+        // Vouchers this order just earned are shown once, to the browser that placed it.
+        $vouchers = $canUploadProof ? PromoCode::whereIn('code', session()->pull('earned_vouchers', []))->get() : collect();
+
+        return view('pages.checkout-confirmation', compact('order', 'canUploadProof', 'vouchers'));
     }
 
     public function uploadProof(Request $request, Order $order): RedirectResponse

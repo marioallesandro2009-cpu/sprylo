@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $pageMeta->title ?? ('Checkout — '.($settings['site_name'] ?? 'Sprylo')))
+@section('title', $pageMeta->title ?? ('Checkout — '.($settings['site_name'] ?? 'solis')))
 @section('meta_description', $pageMeta->meta_description ?? '')
 
 @push('styles')
@@ -19,5 +19,6 @@
     <script src="{{ asset('assets/js/checkout-map.js') }}" defer></script>
     <script src="{{ asset('assets/js/checkout-shipping.js') }}" defer></script>
     <script src="{{ asset('assets/js/checkout-payment.js') }}" defer></script>
+    <script src="{{ asset('assets/js/checkout-delivery.js') }}" defer></script>
     <script src="{{ asset('assets/js/checkout-variant.js') }}" defer></script>
 @endpush

@@ -41,6 +41,9 @@
                 {{ $product->has_variants ? 'From ' : '' }}{{ rupiah($product->sale_price ?? $product->price) }}
                 @if($product->sale_price)
                   <span class="text-muted text-decoration-line-through small">{{ rupiah($product->price) }}</span>
+                  @if($product->promo)
+                    <span class="badge {{ $product->promo->is_flash ? 'bg-danger' : 'bg-primary' }} ms-1">{{ $product->promo->is_flash ? 'Flash sale' : 'Discount' }}</span>
+                  @endif
                 @endif
                 @if($product->has_variants)
                   <span class="badge bg-light text-dark border ms-1">{{ $product->variants_count }} variant(s)</span>
@@ -56,7 +59,7 @@
               </td>
               <td class="text-end">
                 <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
-                <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this product?');">
+                <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-inline" data-confirm="Delete this product?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                 </form>

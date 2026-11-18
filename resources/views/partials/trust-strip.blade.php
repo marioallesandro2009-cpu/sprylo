@@ -1,4 +1,4 @@
-<div style="margin-top: var(--s7); display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s4); padding: var(--s5); background: var(--bg); border-radius: var(--r)">
+<div class="trust-strip">
   <div style="display:flex; align-items:center; gap:var(--s3)">
     <div style="width:40px; height:40px; background:var(--indigo-soft); color:var(--indigo); border-radius:999px; display:grid; place-items:center; font-size:18px">⚡</div>
     <div>

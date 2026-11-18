@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Log in — '.($settings['site_name'] ?? 'Sprylo'))
+@section('title', 'Log in — '.($settings['site_name'] ?? 'solis'))
 
 @section('content')
   <section class="page-head">
@@ -13,10 +13,6 @@
 
   <section class="section">
     <div class="container" style="max-width: 480px">
-
-      @if(session('success'))
-        <p style="color: var(--emerald); font-weight: 600; margin-bottom: var(--s5)">{{ session('success') }}</p>
-      @endif
 
       <form action="{{ route('login') }}" method="POST" style="background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r); padding: var(--s7)">
         @csrf

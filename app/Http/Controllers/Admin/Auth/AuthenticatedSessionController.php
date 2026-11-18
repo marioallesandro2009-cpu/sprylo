@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,6 +49,8 @@ class AuthenticatedSessionController extends Controller
                 'ip' => $request->ip(),
             ]);
 
+            $this->recordFailedLogin($credentials['email'], 'Failed admin sign-in for');
+
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records.',
             ]);
@@ -65,6 +69,8 @@ class AuthenticatedSessionController extends Controller
                 'ip' => $request->ip(),
             ]);
 
+            $this->recordFailedLogin($credentials['email'], 'Non-admin account tried to sign in to the admin panel:');
+
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records.',
             ]);
@@ -79,6 +85,8 @@ class AuthenticatedSessionController extends Controller
             'ip' => $request->ip(),
         ]);
 
+        Audit::record('login', Auth::user()->name.' signed in', Auth::user());
+
         return redirect()->intended(route('admin.dashboard'));
     }
 
@@ -87,8 +95,27 @@ class AuthenticatedSessionController extends Controller
         return Str::transliterate(Str::lower($request->input('email')).'|'.$request->ip());
     }
 
+    /** A failed attempt is attributed to the matching admin account when the email exists, so it shows up on their row. */
+    private function recordFailedLogin(string $email, string $prefix): void
+    {
+        $account = User::where('email', $email)->first();
+
+        Audit::record(
+            'login_failed',
+            "{$prefix} {$email}",
+            $account && $account->isAdmin() ? $account : null,
+            null,
+            null,
+            ['user_email' => $account?->email ?? $email, 'user_name' => $account?->name],
+        );
+    }
+
     public function destroy(Request $request): RedirectResponse
     {
+        if ($user = Auth::user()) {
+            Audit::record('logout', $user->name.' signed out', $user);
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

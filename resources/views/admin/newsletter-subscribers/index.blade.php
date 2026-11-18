@@ -26,7 +26,7 @@
               <td class="fw-semibold">{{ $subscriber->email }}</td>
               <td class="text-muted small">{{ $subscriber->created_at->format('d M Y, H:i') }}</td>
               <td class="text-end">
-                <form action="{{ route('admin.newsletter-subscribers.destroy', $subscriber) }}" method="POST" class="d-inline" onsubmit="return confirm('Remove this subscriber?');">
+                <form action="{{ route('admin.newsletter-subscribers.destroy', $subscriber) }}" method="POST" class="d-inline" data-confirm="Remove this subscriber?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                 </form>

@@ -6,7 +6,7 @@
         <p style="color: var(--fg-soft); font-size: var(--text-sm); line-height: 1.6">{{ $faq->answer }}</p>
       </article>
     @empty
-      <p style="color: var(--fg-soft)">No help articles yet.</p>
+      <p style="color: var(--fg-soft)">{{ $ui('ui_help_empty') }}</p>
     @endforelse
   </div>
 </section>

@@ -10,9 +10,9 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            'site_name' => 'Sprylo',
-            'site_tagline' => 'Tech & Gadgets Ecommerce HTML Template',
-            'site_description' => 'Sprylo is a modern online store for tech and electronics — smartphones, laptops, cameras, audio, and wearables.',
+            'site_name' => 'solis',
+            'site_tagline' => 'Gadgets, gizmos & good deals',
+            'site_description' => 'solis is a modern online store for tech and electronics — smartphones, laptops, cameras, audio, and wearables.',
             'logo' => null,
             'favicon' => null,
 
@@ -34,7 +34,7 @@ class SettingSeeder extends Seeder
             'social_youtube' => '#',
 
             'footer_about_text' => "Modern tech & gadgets — straight from the makers, shipped fast, supported well. Since 2018, we've moved over 400,000 boxes.",
-            'footer_copyright' => '© '.date('Y').' Sprylo · All rights reserved',
+            'footer_copyright' => '© '.date('Y').' solis · All rights reserved',
 
             'hero_product_slug' => 'apple-homepod-2nd-gen',
 
@@ -65,11 +65,11 @@ class SettingSeeder extends Seeder
             'contact_livechat_label' => 'LIVE CHAT',
             'contact_livechat_status' => 'Open chat — 4 agents online',
 
-            'about_heading' => 'About Sprylo',
+            'about_heading' => 'About solis',
             'about_body' => "We're a small team obsessed with getting good tech gear into your hands without the markup or the runaround. Every product we stock, we've tested ourselves.",
             'about_image' => 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80&auto=format&fit=crop',
             'history_heading' => 'Our story',
-            'history_body' => "Sprylo started in 2018 as a two-person operation shipping headphones out of a garage. Since then we've moved over 400,000 boxes, opened a flagship in San Francisco, and kept the same rule: if we wouldn't buy it ourselves, we don't sell it.",
+            'history_body' => "solis started in 2018 as a two-person operation shipping headphones out of a garage. Since then we've moved over 400,000 boxes, opened a flagship in San Francisco, and kept the same rule: if we wouldn't buy it ourselves, we don't sell it.",
 
             'section_hero_enabled' => '1',
             'section_trending_enabled' => '1',

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
 class PageContent extends Model
 {
+    use Auditable;
+
     protected $fillable = ['key', 'page', 'label', 'type', 'value', 'default_value', 'sort_order'];
 
     /** @return array<string, ?string> key => value (null = pakai default dari Blade) */

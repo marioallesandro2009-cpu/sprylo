@@ -1,9 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'SEO / Page Meta')
-@section('page-title', 'SEO / Page Meta')
+@section('title', 'Page SEO')
+@section('page-title', 'Page SEO')
 
 @section('content')
+
+  <div class="d-flex justify-content-end mb-3">
+    <a href="{{ route('admin.page-meta.create') }}" class="btn btn-admin-primary"><i class="fa-solid fa-plus me-1"></i> Add Page</a>
+  </div>
 
   <div class="card-admin">
     <div class="table-responsive">
@@ -14,15 +18,19 @@
         <tbody>
           @forelse($pages as $page)
             <tr>
-              <td><code>{{ $page->page_slug }}</code></td>
-              <td class="fw-semibold">{{ $page->title ?: '—' }}</td>
-              <td class="text-muted small">{{ \Illuminate\Support\Str::limit($page->meta_description, 90) ?: '—' }}</td>
+              <td class="fw-semibold">{{ $page->page_slug }}</td>
+              <td>{{ $page->title }}</td>
+              <td class="text-muted small">{{ \Illuminate\Support\Str::limit($page->meta_description, 90) }}</td>
               <td class="text-end">
                 <a href="{{ route('admin.page-meta.edit', $page) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+                <form action="{{ route('admin.page-meta.destroy', $page) }}" method="POST" class="d-inline" data-confirm="Delete this page SEO entry?">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                </form>
               </td>
             </tr>
           @empty
-            <tr><td colspan="4" class="text-center text-muted py-4">No pages yet.</td></tr>
+            <tr><td colspan="4" class="text-center text-muted py-4">No page SEO entries yet.</td></tr>
           @endforelse
         </tbody>
       </table>

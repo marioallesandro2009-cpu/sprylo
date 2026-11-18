@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,8 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    use Auditable;
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
@@ -54,7 +57,12 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['admin', 'super_admin'], true);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
     }
 
     public function isBanned(): bool
@@ -78,5 +86,19 @@ class User extends Authenticatable
     public function isActive(): bool
     {
         return ! $this->isBanned() && ! $this->isSuspended();
+    }
+
+    public function auditType(): string
+    {
+        return match ($this->role) {
+            'super_admin' => 'Super admin account',
+            'admin' => 'Admin account',
+            default => 'Customer',
+        };
+    }
+
+    public function auditLabel(): string
+    {
+        return $this->name.' ('.$this->email.')';
     }
 }

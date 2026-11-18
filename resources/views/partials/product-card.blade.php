@@ -6,7 +6,7 @@
 <article class="product-card">
   <div class="img-wrap">
     @if($product->badge)
-      <span class="badge @if($product->badge === 'Sale') badge--sale @endif">{{ $product->badge }}</span>
+      <span class="badge @if(in_array($product->badge, ['Sale', 'Flash Sale'])) badge--sale @endif">{{ $product->badge }}</span>
     @endif
     @if(in_array($product->id, $wishlistIds ?? []))
       <form action="{{ route('wishlist.remove', $product) }}" method="POST" style="display:contents">
@@ -23,12 +23,12 @@
   </div>
   <div class="stock">
     <span class="dot @if($product->stock < 1) is-out @endif"></span>
-    @if($product->stock < 1) Sold out @else In stock · {{ $product->stock }} items @endif
+    {{ $product->stock < 1 ? $ui('ui_product_sold_out') : $ui('ui_product_in_stock', ['stock' => $product->stock]) }}
   </div>
   <a href="{{ route('product.show', $product) }}" class="name">{{ $product->name }}</a>
   <div class="price">
     @if($product->has_variants)
-      <span class="now">From {{ rupiah($displayPrice) }}</span>
+      <span class="now">{{ $ui('ui_price_from') }} {{ rupiah($displayPrice) }}</span>
     @else
       <span class="now">{{ rupiah($displayPrice) }}</span>
       @if($product->sale_price)
@@ -36,9 +36,17 @@
       @endif
     @endif
   </div>
+  @if($product->promo?->is_flash && $product->promo->remaining !== null)
+    <div class="flash-left">⚡ {{ $product->promo->remaining }} left at this price</div>
+  @endif
   <div class="stars">{{ str_repeat('★', $rating) }}{{ str_repeat('☆', 5 - $rating) }} <span class="count">({{ $product->reviews_count }})</span></div>
+  @php $comparing = in_array($product->id, $compareIds ?? []); @endphp
+  <form action="{{ route('compare.toggle', $product) }}" method="POST" class="compare-form">
+    @csrf
+    <button type="submit" class="compare-btn {{ $comparing ? 'is-active' : '' }}" aria-pressed="{{ $comparing ? 'true' : 'false' }}">{{ $comparing ? '✓ Comparing' : '⇄ Compare' }}</button>
+  </form>
   <form action="{{ route('cart.add', $product) }}" method="POST">
     @csrf
-    <button type="submit" class="btn" @disabled($product->stock < 1)>{{ $product->stock < 1 ? 'Sold out' : 'Order now →' }}</button>
+    <button type="submit" class="btn" @disabled($product->stock < 1)>{{ $product->stock < 1 ? $ui('ui_product_sold_out') : $ui('ui_card_order_now') }}</button>
   </form>
 </article>

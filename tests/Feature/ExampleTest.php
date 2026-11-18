@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
+    // The storefront reads settings/nav/footer from the database on every page, so the schema must exist.
+    use RefreshDatabase;
+
     /**
      * A basic test example.
      */

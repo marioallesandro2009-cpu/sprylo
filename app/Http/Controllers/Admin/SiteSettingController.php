@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class SiteSettingController extends Controller
@@ -36,6 +37,7 @@ class SiteSettingController extends Controller
         'privacy_contact_heading', 'privacy_contact_body',
         'footer_credit_text',
         'payment_bank_name', 'payment_bank_account_number', 'payment_bank_account_holder',
+        'invoice_company_name', 'invoice_footer_note',
         'payment_qris_image',
         'shop_head_title', 'shop_head_text',
         'contact_head_title', 'contact_head_text',
@@ -43,10 +45,19 @@ class SiteSettingController extends Controller
         'help_head_title', 'help_head_text',
         'cart_empty_text', 'wishlist_empty_text',
         'newsletter_placeholder', 'newsletter_button_label', 'newsletter_success_text',
+        'categories_head_title', 'categories_head_text',
+        'brands_head_title', 'brands_head_text',
+        'wishlist_head_title', 'wishlist_head_empty_text',
+        'cart_head_title', 'track_head_title', 'track_head_text',
+        'home_trending_title', 'home_trending_link_label', 'home_trending_all_label',
+        'home_just_for_you_title', 'home_just_for_you_link_label',
+        'footer_categories_title',
+        'contact_label_email', 'contact_label_phone', 'contact_label_address', 'contact_label_hours', 'contact_form_note',
+        'privacy_last_updated',
     ];
 
     private const NUMERIC_KEYS = [
-        'shipping_free_threshold', 'shipping_fee', 'insurance_fee',
+        'shipping_free_threshold', 'shipping_fee', 'insurance_fee', 'delivery_slot_capacity',
     ];
 
     private const SECTION_KEYS = [
@@ -67,7 +78,13 @@ class SiteSettingController extends Controller
             ->merge(collect(self::NUMERIC_KEYS)->mapWithKeys(fn ($key) => [$key => ['nullable', 'numeric', 'min:0']]))
             ->all();
 
+        $rules['payment_qris_file'] = ['nullable', 'image', 'max:4096'];
+
         $data = $request->validate($rules);
+
+        if ($request->hasFile('payment_qris_file')) {
+            $data['payment_qris_image'] = Storage::url($request->file('payment_qris_file')->store('payment', 'public'));
+        }
 
         foreach ([...self::TEXT_KEYS, ...self::NUMERIC_KEYS] as $key) {
             Setting::updateOrCreate(['key' => $key], ['value' => $data[$key] ?? null]);

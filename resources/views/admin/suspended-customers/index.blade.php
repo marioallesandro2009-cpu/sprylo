@@ -19,7 +19,7 @@
 @section('content')
 
   <div class="d-flex justify-content-end mb-3">
-    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#suspendCustomerModal">
+    <button type="button" class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#suspendCustomerModal">
       <i class="fa-solid fa-hourglass-half"></i> Suspend Customer
     </button>
   </div>
@@ -50,7 +50,7 @@
               </td>
               <td data-label="Suspended By">{{ $suspension->creator?->name ?? '—' }}</td>
               <td data-label="Actions" class="text-end">
-                <form action="{{ route('admin.suspended-customers.destroy', $suspension) }}" method="POST" class="d-inline" onsubmit="return confirm('Lift this suspension?');">
+                <form action="{{ route('admin.suspended-customers.destroy', $suspension) }}" method="POST" class="d-inline" data-confirm="Lift this suspension?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-check"></i> Lift Suspension</button>
                 </form>

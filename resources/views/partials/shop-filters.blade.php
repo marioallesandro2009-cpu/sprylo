@@ -2,7 +2,7 @@
   $hasActiveFilters = request()->anyFilled(['categories', 'brands', 'price_min', 'price_max', 'min_rating', 'in_stock', 'on_sale', 'new_arrivals']);
 @endphp
 <button type="button" class="filters-toggle" aria-expanded="false" aria-controls="shop-filters">
-  <span>Filters @if($hasActiveFilters)<span class="dot"></span>@endif</span>
+  <span>{{ $ui('ui_filters_toggle') }} @if($hasActiveFilters)<span class="dot"></span>@endif</span>
   <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </button>
 <form class="filters" id="shop-filters" aria-label="Filters" method="GET" action="{{ route('shop.index') }}">
@@ -17,8 +17,8 @@
     <div style="display:flex; justify-content:space-between; font-family:var(--ff-mono); font-size:11px; color:var(--fg-mute)">
       <span>{{ rupiah($priceRange['min']) }}</span><span>{{ rupiah($priceRange['max']) }}</span></div>
     <div style="display:flex; gap:8px; margin-top:var(--s2)">
-      <input type="number" name="price_min" value="{{ request('price_min') }}" placeholder="Min" style="width:50%; font-family:var(--ff-mono); font-size:var(--text-xs); padding:6px 8px; border:1px solid var(--rule); border-radius:6px" />
-      <input type="number" name="price_max" value="{{ request('price_max') }}" placeholder="Max" style="width:50%; font-family:var(--ff-mono); font-size:var(--text-xs); padding:6px 8px; border:1px solid var(--rule); border-radius:6px" />
+      <input type="number" name="price_min" value="{{ request('price_min') }}" placeholder="{{ $ui('ui_filters_price_min') }}" style="width:50%; font-family:var(--ff-mono); font-size:var(--text-xs); padding:6px 8px; border:1px solid var(--rule); border-radius:6px" />
+      <input type="number" name="price_max" value="{{ request('price_max') }}" placeholder="{{ $ui('ui_filters_price_max') }}" style="width:50%; font-family:var(--ff-mono); font-size:var(--text-xs); padding:6px 8px; border:1px solid var(--rule); border-radius:6px" />
     </div>
   </div>
   <div class="filter-block">
@@ -30,14 +30,14 @@
   <div class="filter-block">
     <h3>{{ cms('shop.filter.rating', 'Rating') }}</h3>
     @foreach([5, 4, 3] as $stars)
-      <label><input type="radio" name="min_rating" value="{{ $stars }}" @checked(request('min_rating') == $stars)> {{ str_repeat('★', $stars) }}{{ str_repeat('☆', 5 - $stars) }} &amp; up <span class="ct">{{ $ratingCounts[$stars] }}</span></label>
+      <label><input type="radio" name="min_rating" value="{{ $stars }}" @checked(request('min_rating') == $stars)> {{ str_repeat('★', $stars) }}{{ str_repeat('☆', 5 - $stars) }} {{ $ui('ui_filters_rating_suffix') }} <span class="ct">{{ $ratingCounts[$stars] }}</span></label>
     @endforeach
   </div>
   <div class="filter-block">
     <h3>{{ cms('shop.filter.availability', 'Availability') }}</h3>
-    <label><input type="checkbox" name="in_stock" value="1" @checked(request('in_stock'))> In stock <span class="ct">{{ $availabilityCounts['in_stock'] }}</span></label>
-    <label><input type="checkbox" name="on_sale" value="1" @checked(request('on_sale'))> On sale <span class="ct">{{ $availabilityCounts['on_sale'] }}</span></label>
-    <label><input type="checkbox" name="new_arrivals" value="1" @checked(request('new_arrivals'))> New arrivals <span class="ct">{{ $availabilityCounts['new_arrivals'] }}</span></label>
+    <label><input type="checkbox" name="in_stock" value="1" @checked(request('in_stock'))> {{ $ui('ui_filters_in_stock') }} <span class="ct">{{ $availabilityCounts['in_stock'] }}</span></label>
+    <label><input type="checkbox" name="on_sale" value="1" @checked(request('on_sale'))> {{ $ui('ui_filters_on_sale') }} <span class="ct">{{ $availabilityCounts['on_sale'] }}</span></label>
+    <label><input type="checkbox" name="new_arrivals" value="1" @checked(request('new_arrivals'))> {{ $ui('ui_filters_new_arrivals') }} <span class="ct">{{ $availabilityCounts['new_arrivals'] }}</span></label>
   </div>
   <input type="hidden" name="sort" value="{{ request('sort') }}" />
   <button type="submit" class="btn btn--indigo btn--block">{{ cms('shop.filter.apply', 'Apply filters') }}</button>

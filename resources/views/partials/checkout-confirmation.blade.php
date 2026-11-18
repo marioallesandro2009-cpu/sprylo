@@ -8,6 +8,17 @@
 
 <section class="section">
   <div class="container" style="max-width: 640px">
+    @foreach($vouchers ?? [] as $voucher)
+      <div class="voucher-card">
+        <div class="voucher-card__kicker">🎁 A voucher for your next order</div>
+        <div class="voucher-card__code">{{ $voucher->code }}</div>
+        <div class="voucher-card__meta">
+          {{ $voucher->type === 'percent' ? (float) $voucher->value.'% off' : rupiah($voucher->value).' off' }}
+          @if($voucher->min_subtotal) · min. order {{ rupiah($voucher->min_subtotal) }}@endif
+          · valid until {{ $voucher->expires_at->format('d M Y') }} · one use · also sent to {{ $order->email }}
+        </div>
+      </div>
+    @endforeach
     <div style="background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r); padding: var(--s7)">
 
       @include('partials.order-summary-card')
@@ -20,20 +31,13 @@
           @endif
           <p class="payment-qris-note">Scan the QRIS code above to complete your payment of {{ rupiah($order->total) }}.</p>
         @elseif($order->payment_proof_path)
-          @if(session('success'))
-            <p style="color: var(--emerald); font-weight: 600; margin-bottom: var(--s2)">{{ session('success') }}</p>
-          @endif
           <p style="color: var(--fg-soft); font-size: var(--text-sm)">Proof received — awaiting verification by our team.</p>
         @else
           <p style="color: var(--fg-soft); font-size: var(--text-sm); margin-bottom: var(--s4)">
             Please transfer {{ rupiah($order->total) }} to the account below, then upload your proof of payment
             so we can confirm your order.
           </p>
-          <div class="payment-bank-details">
-            <div><span>Bank</span><strong>{{ $settings['payment_bank_name'] ?? '—' }}</strong></div>
-            <div><span>Account no.</span><strong>{{ $settings['payment_bank_account_number'] ?? '—' }}</strong></div>
-            <div><span>Account holder</span><strong>{{ $settings['payment_bank_account_holder'] ?? '—' }}</strong></div>
-          </div>
+          @include('partials.bank-details')
           @if($canUploadProof && $order->status === 'awaiting_proof')
             <form action="{{ route('checkout.payment-proof', $order) }}" method="POST" enctype="multipart/form-data" style="margin-top: var(--s5)">
               @csrf

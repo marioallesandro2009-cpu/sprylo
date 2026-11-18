@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use App\Support\PromoTheme;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class HeroSlide extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'size', 'theme', 'eyebrow', 'heading', 'description',
         'cta_label', 'image', 'product_id', 'sort_order', 'is_active',

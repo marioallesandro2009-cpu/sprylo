@@ -18,7 +18,7 @@ class AdminLayoutTest extends TestCase
         'admin.promo-codes.index', 'admin.discounts.index', 'admin.flash-sales.index', 'admin.voucher-rules.index', 'admin.promo-banners.index',
         'admin.users.index', 'admin.contact-messages.index', 'admin.suspended-customers.index', 'admin.newsletter-subscribers.index',
         'admin.hero-slides.index', 'admin.nav-links.index', 'admin.footer-links.index', 'admin.faqs.index', 'admin.content.index', 'admin.ui-texts.index', 'admin.page-meta.index',
-        'admin.settings.index', 'admin.account.edit', 'admin.logout', 'home',
+        'admin.stock-movements.index', 'admin.reports.finance', 'admin.settings.index', 'admin.account.edit', 'admin.logout', 'home',
     ];
 
     private const SUPER_ADMIN_ROUTES = ['admin.admin-users.index', 'admin.audit-logs.index'];

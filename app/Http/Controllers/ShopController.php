@@ -34,24 +34,24 @@ class ShopController extends Controller
             $query->whereIn('brand_id', (array) $request->brands);
         }
         if ($request->filled('price_min')) {
-            $query->whereRaw('COALESCE(sale_price, price) >= ?', [$request->price_min]);
+            $query->whereRaw('LEAST(COALESCE(sale_price, price), COALESCE(promo_price, price)) >= ?', [$request->price_min]);
         }
         if ($request->filled('price_max')) {
-            $query->whereRaw('COALESCE(sale_price, price) <= ?', [$request->price_max]);
+            $query->whereRaw('LEAST(COALESCE(sale_price, price), COALESCE(promo_price, price)) <= ?', [$request->price_max]);
         }
         if ($request->boolean('in_stock')) {
             $query->where('stock', '>', 0);
         }
         if ($request->boolean('on_sale')) {
-            $query->whereNotNull('sale_price');
+            $query->where(fn ($q) => $q->whereNotNull('sale_price')->orWhereNotNull('promo_price'));
         }
         if ($request->boolean('new_arrivals')) {
             $query->where('created_at', '>=', now()->subDays(14));
         }
 
         match ($request->get('sort')) {
-            'price_asc' => $query->orderByRaw('COALESCE(sale_price, price) asc'),
-            'price_desc' => $query->orderByRaw('COALESCE(sale_price, price) desc'),
+            'price_asc' => $query->orderByRaw('LEAST(COALESCE(sale_price, price), COALESCE(promo_price, price)) asc'),
+            'price_desc' => $query->orderByRaw('LEAST(COALESCE(sale_price, price), COALESCE(promo_price, price)) desc'),
             'newest' => $query->latest(),
             'rating' => $query->orderByDesc('rating_avg'),
             default => $query->orderByDesc('reviews_count'),

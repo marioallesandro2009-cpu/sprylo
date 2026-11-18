@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use App\Models\Concerns\HasUniqueSlug;
+use App\Support\Pricing;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
+    use Auditable;
+
     use HasUniqueSlug;
 
     protected $fillable = [
@@ -82,10 +86,13 @@ class Product extends Model
             return;
         }
 
+        // Raw sale price on purpose: the sale_price accessor folds in scheduled promos, which
+        // must never be baked into the stored column.
         $minPrice = $variants->min(fn (ProductVariant $v) => (float) $v->price);
-        $minEffective = $variants->min(fn (ProductVariant $v) => (float) ($v->sale_price ?? $v->price));
+        $minEffective = $variants->min(fn (ProductVariant $v) => (float) ($v->getRawOriginal('sale_price') ?? $v->price));
 
-        $this->update([
+        // Quietly: this is a roll-up of the variants, not a separate edit to attribute to someone.
+        $this->updateQuietly([
             'price' => $minPrice,
             'sale_price' => $minEffective < $minPrice ? $minEffective : null,
             'stock' => $variants->sum('stock'),
@@ -93,8 +100,27 @@ class Product extends Model
         ]);
     }
 
+    /**
+     * The price shoppers actually see: the manual sale price or the scheduled/flash promo,
+     * whichever is lower. The stored sale_price column is left untouched (see getRawOriginal).
+     */
+    public function getSalePriceAttribute($value)
+    {
+        return Pricing::effectiveSalePrice($value, $this->attributes['promo_price'] ?? null, $this->attributes['price'] ?? null);
+    }
+
+    /** The live discount currently driving this product's promo price, if any. */
+    public function getPromoAttribute(): ?Discount
+    {
+        return Pricing::promoFor($this->attributes['promo_discount_id'] ?? null, $this->attributes['promo_price'] ?? null, $this->getRawOriginal('sale_price'));
+    }
+
     public function getBadgeAttribute(): ?string
     {
+        if ($this->promo?->is_flash) {
+            return 'Flash Sale';
+        }
+
         if (! is_null($this->sale_price)) {
             return 'Sale';
         }

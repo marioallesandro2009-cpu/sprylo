@@ -62,6 +62,7 @@ class PromoBannerController extends Controller
     private function eligibleProducts(?int $keepId = null)
     {
         return Product::whereNotNull('sale_price')
+            ->orWhereNotNull('promo_price')
             ->orWhere('id', $keepId)
             ->orderBy('name')
             ->get();

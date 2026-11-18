@@ -102,7 +102,7 @@ class PpnTest extends TestCase
     public function test_the_email_and_invoice_name_the_tax(): void
     {
         $order = Order::create([
-            'order_number' => 'SPR-PPN001', 'invoice_number' => 'INV-202611-0099', 'invoiced_at' => now(),
+            'order_number' => 'SPR-PPN001', 'invoice_number' => 'INV-2611-0099', 'invoiced_at' => now(),
             'name' => 'Test', 'email' => 'test@example.com', 'phone' => '0800', 'address' => 'Test', 'city' => 'Jakarta', 'postal_code' => '10110',
             'subtotal' => 1000000, 'shipping' => 0, 'tax' => 108000, 'promo_code' => 'HEMAT', 'promo_discount' => 100000, 'total' => 1008000,
             'status' => 'paid', 'payment_method' => 'qris',

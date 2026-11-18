@@ -11,6 +11,7 @@
     ]],
     ['type' => 'group', 'id' => 'produk', 'label' => 'Produk', 'icon' => 'fa-box', 'items' => [
       ['Semua Produk', 'admin.products.index', ['admin.products.*']],
+      ['Riwayat Stok', 'admin.stock-movements.index', ['admin.stock-movements.*']], // update 1: menu riwayat stok
       ['Kategori', 'admin.categories.index', ['admin.categories.*']],
       ['Brand', 'admin.brands.index', ['admin.brands.*']],
       ['Ulasan', 'admin.reviews.index', ['admin.reviews.*']],
@@ -28,6 +29,7 @@
       ['Ditangguhkan', 'admin.suspended-customers.index', ['admin.suspended-customers.*']],
       ['Newsletter', 'admin.newsletter-subscribers.index', ['admin.newsletter-subscribers.*']],
     ]],
+    ['type' => 'link', 'label' => 'Laporan Keuangan', 'icon' => 'fa-chart-line', 'route' => 'admin.reports.finance', 'match' => ['admin.reports.*']],
     ['type' => 'group', 'id' => 'konten', 'label' => 'Konten', 'icon' => 'fa-pen-to-square', 'items' => [
       ['Hero Slide', 'admin.hero-slides.index', ['admin.hero-slides.*']],
       ['Navigasi', 'admin.nav-links.index', ['admin.nav-links.*']],

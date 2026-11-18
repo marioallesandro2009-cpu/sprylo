@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -44,7 +45,7 @@ class BrandController extends Controller
 
     public function update(Request $request, Brand $brand): RedirectResponse
     {
-        $data = $this->validateBrand($request);
+        $data = $this->validateBrand($request, $brand);
 
         if ($brand->name !== $data['name']) {
             $data['slug'] = Brand::generateUniqueSlug($data['name'], $brand->id);
@@ -72,10 +73,10 @@ class BrandController extends Controller
         return redirect()->route('admin.brands.index')->with('success', 'Brand deleted.');
     }
 
-    private function validateBrand(Request $request): array
+    private function validateBrand(Request $request, ?Brand $brand = null): array
     {
         return $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('brands', 'name')->ignore($brand?->id)],
             'website_url' => ['nullable', 'string', 'max:255'],
             'sort_order' => ['nullable', 'integer'],
             'logo' => ['nullable', 'image', 'max:4096'],

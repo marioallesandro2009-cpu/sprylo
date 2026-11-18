@@ -36,7 +36,7 @@
               </td>
               <td class="text-end">
                 <a href="{{ route('admin.promo-banners.edit', $banner) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
-                <form action="{{ route('admin.promo-banners.destroy', $banner) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this banner?');">
+                <form action="{{ route('admin.promo-banners.destroy', $banner) }}" method="POST" class="d-inline" data-confirm="Delete this banner?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                 </form>

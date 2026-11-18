@@ -94,14 +94,26 @@
   }
 
   /**
+   * Nominatim reports the province as "city" for some Indonesian places (e.g. Jakarta), so skip any
+   * candidate equal to the state name and fall through to the municipality / county instead.
+   */
+  function pickCity(address) {
+    const state = (address.state || '').trim().toLowerCase();
+    const looksLikeProvince = /special (capital )?region|daerah khusus|province|provinsi/i;
+    // city_district is where Jakarta's real city ("Central Jakarta") lives when "city" holds the province.
+    const candidates = [address.city, address.town, address.municipality, address.county, address.city_district, address.village];
+
+    return candidates.find((c) => c && c.trim().toLowerCase() !== state && !looksLikeProvince.test(c)) || '';
+  }
+
+  /**
    * Fills the address/city/postal fields from a Nominatim address payload, but only
    * where the shopper hasn't typed anything yet — a dragged pin shouldn't clobber
    * details they already entered.
    */
   function fillAddressFields(displayName, address) {
     address = address || {};
-    const city = address.city || address.town || address.municipality
-      || address.county || address.village || '';
+    const city = pickCity(address);
 
     if (addressInput && !addressInput.value.trim() && displayName) {
       addressInput.value = displayName;
@@ -192,8 +204,7 @@
       // whatever was auto-filled by an earlier pin drop.
       if (addressInput) addressInput.value = result.display_name;
       if (result.address) {
-        const city = result.address.city || result.address.town || result.address.municipality
-          || result.address.county || result.address.village;
+        const city = pickCity(result.address);
         if (cityInput && city) cityInput.value = city;
         if (postalInput && result.address.postcode) postalInput.value = result.address.postcode;
         if (city) lookupPostalCode(city);
@@ -284,7 +295,12 @@
         statusEl.dataset.state = 'invalid';
         statusEl.textContent = 'Please pin your delivery location on the map before placing the order.';
       }
-      mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (window.SpryloAlert) {
+        window.SpryloAlert('warning', 'Pin your delivery location', 'Search your address or tap the map so we know where to deliver.')
+          .then(() => mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+      } else {
+        mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
 

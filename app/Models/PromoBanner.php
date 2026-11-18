@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use App\Support\PromoTheme;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PromoBanner extends Model
 {
+    use Auditable;
+
     protected $fillable = ['product_id', 'label', 'theme', 'sort_order', 'is_active'];
 
     protected $casts = [

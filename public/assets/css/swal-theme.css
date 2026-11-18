@@ -1,0 +1,78 @@
+/* Sprylo — SweetAlert2 theme (shared by storefront and admin) */
+:root {
+  --sw-indigo: #4F46E5;
+  --sw-indigo-deep: #3730A3;
+  --sw-indigo-soft: #EEF2FF;
+  --sw-rose: #E11D48;
+  --sw-rose-deep: #BE123C;
+  --sw-ink: #0F172A;
+  --sw-muted: #475569;
+}
+
+.swal2-container { z-index: 20000; }
+
+.swal2-popup {
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  border-radius: 22px;
+  padding: 1.9rem 1.6rem 1.5rem;
+  box-shadow: 0 28px 64px -16px rgba(15, 23, 42, 0.4);
+}
+
+.swal2-title {
+  font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--sw-ink);
+  letter-spacing: -0.01em;
+}
+
+.swal2-html-container {
+  color: var(--sw-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.swal2-actions { gap: 0.6rem; margin-top: 1.4rem; }
+
+.swal2-styled {
+  border-radius: 999px !important;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.7rem 1.5rem;
+  box-shadow: none !important;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.swal2-styled:hover { transform: translateY(-1px); }
+.swal2-styled:focus-visible { outline: 3px solid var(--sw-indigo-soft); outline-offset: 2px; }
+
+.swal2-styled.swal2-confirm { background: var(--sw-indigo) !important; color: #fff !important; }
+.swal2-styled.swal2-confirm:hover { background: var(--sw-indigo-deep) !important; }
+.swal2-styled.swal2-confirm.is-danger { background: var(--sw-rose) !important; }
+.swal2-styled.swal2-confirm.is-danger:hover { background: var(--sw-rose-deep) !important; }
+.swal2-styled.swal2-cancel { background: var(--sw-indigo-soft) !important; color: var(--sw-indigo-deep) !important; }
+
+/* Toasts */
+.swal2-popup.swal2-toast {
+  border-radius: 14px;
+  padding: 0.8rem 1.1rem;
+  box-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.35);
+  border: 1px solid #E2E8F0;
+  align-items: center;
+  width: auto;
+  max-width: min(92vw, 380px);
+}
+.swal2-toast .swal2-title {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin: 0 0.6rem;
+  line-height: 1.4;
+  text-align: left;
+}
+.swal2-toast .swal2-icon { margin: 0; }
+.swal2-toast .swal2-timer-progress-bar { background: var(--sw-indigo); }
+
+@media (prefers-reduced-motion: reduce) {
+  .swal2-styled { transition: none; }
+  .swal2-styled:hover { transform: none; }
+}

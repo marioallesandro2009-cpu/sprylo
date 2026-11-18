@@ -23,7 +23,7 @@
               <td class="text-muted small">{{ $link->url }}</td>
               <td class="text-end">
                 <a href="{{ route('admin.footer-links.edit', $link) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
-                <form action="{{ route('admin.footer-links.destroy', $link) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this link?');">
+                <form action="{{ route('admin.footer-links.destroy', $link) }}" method="POST" class="d-inline" data-confirm="Delete this link?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                 </form>

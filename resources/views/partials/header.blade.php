@@ -1,5 +1,5 @@
 @php
-  $siteName = $settings['site_name'] ?? 'Sprylo';
+  $siteName = $settings['site_name'] ?? 'solis';
 @endphp
 <header class="site-header">
   <div class="container">
@@ -7,13 +7,13 @@
       @if(!empty($settings['logo']))
         <img class="brand-mark" src="{{ $settings['logo'] }}" alt="{{ $siteName }}" style="object-fit:cover" />
       @else
-        <span class="brand-mark">{{ strtoupper(substr($siteName, 0, 1)) }}</span>
+        <img class="brand-mark" src="{{ asset('assets/img/logo.svg') }}" alt="{{ $siteName }}" />
       @endif
       {{ $siteName }}
     </a>
 
     <form class="search" role="search" action="{{ route('shop.index') }}" method="GET" autocomplete="off">
-      <input type="text" name="q" placeholder="Search for products, brands, categories…" aria-label="Search the store" value="{{ request('q') }}" />
+      <input type="text" name="q" placeholder="{{ $ui('ui_header_search_placeholder') }}" aria-label="Search the store" value="{{ request('q') }}" />
       <button type="submit" aria-label="Search">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       </button>

@@ -1,6 +1,6 @@
 <section class="section">
   <div class="container">
-    <div class="contact-grid">
+    <div class="co-layout">
       @include('partials.checkout-form')
       @include('partials.checkout-summary')
     </div>

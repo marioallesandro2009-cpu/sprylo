@@ -12,9 +12,9 @@
           <article class="compact-card">
             <div class="pic"><img src="{{ $item->images->first()->image ?? '' }}" alt="{{ $item->name }}" /></div>
             <div>
-              <div class="stock">IN STOCK · {{ $item->stock }}</div>
+              <div class="stock">{{ $ui('ui_just_stock') }} {{ $item->stock }}</div>
               <div class="name">{{ $item->name }}</div>
-              <div class="price">{{ $item->has_variants ? 'From ' : '' }}{{ rupiah($item->sale_price ?? $item->price) }}</div>
+              <div class="price">{{ $item->has_variants ? $ui('ui_price_from').' ' : '' }}{{ rupiah($item->sale_price ?? $item->price) }}</div>
               <form action="{{ route('cart.add', $item) }}" method="POST">
                 @csrf
                 <button type="submit" class="btn" @disabled($item->stock < 1)>{{ $item->stock < 1 ? cms('shop.card.out_of_stock', 'Out of stock') : cms('home.picks.order_now', 'Order Now') }}</button>

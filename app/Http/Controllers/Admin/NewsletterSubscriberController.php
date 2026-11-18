@@ -5,40 +5,30 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class NewsletterSubscriberController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
-        $subscribers = NewsletterSubscriber::query()
-            ->when($request->filled('q'), fn ($q) => $q->where('email', 'like', '%'.$request->q.'%'))
-            ->latest()
-            ->paginate(25)
-            ->withQueryString();
+        $subscribers = NewsletterSubscriber::latest()->paginate(25);
 
-        return view('admin.newsletter-subscribers.index', compact('subscribers'));
+        return view('admin.newsletter.index', compact('subscribers'));
     }
 
     public function export(): StreamedResponse
     {
-        $filename = 'newsletter-subscribers-'.now()->format('Ymd').'.csv';
-
         return response()->streamDownload(function () {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['email', 'subscribed_at'], ',', '"', '\\');
-
+            fputcsv($out, ['email', 'subscribed_at']);
             NewsletterSubscriber::orderBy('id')->chunk(500, function ($rows) use ($out) {
                 foreach ($rows as $row) {
-                    $email = preg_match('/^[=+\-@]/', $row->email) ? "'".$row->email : $row->email;
-                    fputcsv($out, [$email, $row->created_at], ',', '"', '\\');
+                    fputcsv($out, [$row->email, $row->created_at]);
                 }
             });
-
             fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
+        }, 'newsletter-subscribers.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function destroy(NewsletterSubscriber $newsletterSubscriber): RedirectResponse

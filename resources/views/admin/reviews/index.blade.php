@@ -24,7 +24,7 @@
               <td class="text-muted small">{{ \Illuminate\Support\Str::limit($review->comment, 60) }}</td>
               <td class="text-end">
                 <a href="{{ route('admin.reviews.edit', $review) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
-                <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this review?');">
+                <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST" class="d-inline" data-confirm="Delete this review?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                 </form>

@@ -1,10 +1,10 @@
 <div>
-  <h2 style="font-size: var(--text-2xl); margin-bottom: var(--s5)">Reviews</h2>
+  <h2 style="font-size: var(--text-2xl); margin-bottom: var(--s5)">{{ $ui('ui_reviews_title') }}</h2>
   <div style="display:grid; grid-template-columns: auto 1fr; gap: var(--s5); align-items:center; padding: var(--s5); background: var(--bg); border-radius: var(--r); margin-bottom: var(--s5)">
     <div style="text-align:center">
       <div style="font-family: var(--ff-display); font-size: 48px; font-weight: 800; color: var(--ink); line-height: 1">{{ $reviewSummary['average'] }}</div>
       <div style="color: var(--amber); font-size: 18px">{{ str_repeat('★', $product->rating) }}{{ str_repeat('☆', 5 - $product->rating) }}</div>
-      <div style="font-family: var(--ff-mono); font-size: 11px; color: var(--fg-mute); margin-top: 4px">{{ $reviewSummary['count'] }} reviews</div>
+      <div style="font-family: var(--ff-mono); font-size: 11px; color: var(--fg-mute); margin-top: 4px">{{ $ui('ui_reviews_count', ['count' => $reviewSummary['count']]) }}</div>
     </div>
     <div style="display:grid; gap:6px; font-family: var(--ff-mono); font-size: var(--text-xs); color: var(--fg-soft)">
       @foreach($reviewSummary['breakdown'] as $stars => $pct)
@@ -26,6 +26,6 @@
       <p style="font-size: var(--text-sm); color: var(--fg-soft); line-height: 1.6">{{ $review->comment }}</p>
     </article>
   @empty
-    <p style="color: var(--fg-soft); font-size: var(--text-sm)">No reviews yet — be the first to share your experience.</p>
+    <p style="color: var(--fg-soft); font-size: var(--text-sm)">{{ $ui('ui_reviews_empty') }}</p>
   @endforelse
 </div>

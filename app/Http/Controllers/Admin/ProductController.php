@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\DiscountSync;
+use App\Support\StockLedger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -43,10 +46,19 @@ class ProductController extends Controller
         $data['is_active'] = $request->boolean('is_active');
         $data['specs'] = $this->buildSpecs($request);
 
-        $product = Product::create($data);
+        // One transaction so a failure while saving images/variants can't leave a half-created product behind.
+        DB::transaction(function () use ($data, $request) {
+            $product = Product::create($data);
 
-        $this->storeImages($product, $request);
-        $this->syncVariants($product, $request);
+            $this->storeImages($product, $request);
+
+            // update 1: stok awal produk dicatat di riwayat stok
+            if (! $this->syncVariants($product, $request)) {
+                StockLedger::record($product, 0, (int) $product->stock, 'initial');
+            }
+        });
+
+        DiscountSync::run();
 
         return redirect()->route('admin.products.index')->with('success', 'Product created.');
     }
@@ -71,10 +83,24 @@ class ProductController extends Controller
         $data['is_active'] = $request->boolean('is_active');
         $data['specs'] = $this->buildSpecs($request);
 
-        $product->update($data);
+        DB::transaction(function () use ($product, $data, $request) {
+            // update 1: edit stok manual dicatat di riwayat stok
+            // Stok produk bervarian adalah jumlah stok varian, jadi yang dicatat hanya stok varian.
+            $hadVariants = $product->variants()->exists();
+            $stockBefore = (int) $product->stock;
 
-        $this->storeImages($product, $request);
-        $this->syncVariants($product, $request);
+            $product->update($data);
+
+            $this->storeImages($product, $request);
+
+            if (! $this->syncVariants($product, $request)) {
+                // Varian yang baru dihapus semua dihitung stoknya nol sebelum diisi angka dari form.
+                StockLedger::record($product, $hadVariants ? 0 : $stockBefore, (int) $product->stock, 'manual');
+            }
+        });
+
+        // Price changes (or a category/brand change) can alter which discount wins for this product.
+        DiscountSync::run();
 
         return redirect()->route('admin.products.index')->with('success', 'Product updated.');
     }
@@ -137,7 +163,7 @@ class ProductController extends Controller
      * rolls the variant totals back up into the product's own price/stock/weight so every
      * listing/filter/sort query that reads those columns directly keeps working unchanged.
      */
-    private function syncVariants(Product $product, Request $request): void
+    private function syncVariants(Product $product, Request $request): bool
     {
         $rows = collect($request->input('variants', []))
             ->filter(fn ($row) => filled($row['label'] ?? null) && filled($row['price'] ?? null));
@@ -147,7 +173,7 @@ class ProductController extends Controller
         foreach ($rows->values() as $index => $row) {
             $payload = [
                 'label' => $row['label'],
-                'sku' => $row['sku'] ?: null,
+                'sku' => ($row['sku'] ?? null) ?: null,
                 'price' => $row['price'],
                 'sale_price' => filled($row['sale_price'] ?? null) ? $row['sale_price'] : null,
                 'has_warranty' => filled($row['has_warranty'] ?? null),
@@ -158,18 +184,30 @@ class ProductController extends Controller
 
             $variant = ! empty($row['id']) ? $product->variants()->whereKey($row['id'])->first() : null;
 
-            $variant
-                ? $variant->update($payload)
-                : $variant = $product->variants()->create($payload);
+            // update 1: stok varian (baru, diedit, atau dihapus) dicatat di riwayat stok
+            if ($variant) {
+                $before = (int) $variant->stock;
+                $variant->update($payload);
+                StockLedger::record($variant, $before, (int) $variant->stock, 'manual');
+            } else {
+                $variant = $product->variants()->create($payload);
+                StockLedger::record($variant, 0, (int) $variant->stock, 'initial');
+            }
 
             $keepIds[] = $variant->id;
         }
 
-        $product->variants()->whereNotIn('id', $keepIds)->delete();
+        // Varian yang dihapus membawa stoknya pergi; catat sebagai pengurangan.
+        foreach ($product->variants()->whereNotIn('id', $keepIds)->get() as $removed) {
+            StockLedger::record($removed, (int) $removed->stock, 0, 'manual', null, 'Varian dihapus oleh '.(auth()->user()?->name ?? 'admin'));
+            $removed->delete();
+        }
 
         if (! empty($keepIds)) {
             $product->syncFromVariants();
         }
+
+        return ! empty($keepIds);
     }
 
     private function storeImages(Product $product, Request $request): void

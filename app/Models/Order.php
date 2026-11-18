@@ -24,6 +24,9 @@ class Order extends Model
         'payment_method', 'payment_proof_path',
     ];
 
+    /** Orders whose money has come in: what revenue and the financial report count. */
+    public const PAID_STATUSES = ['paid', 'processing', 'shipped', 'completed'];
+
     /** The issue time is bookkeeping; the invoice number itself is worth showing in the audit trail. */
     public array $auditIgnore = ['invoiced_at'];
 

@@ -5,7 +5,7 @@
 
 @section('content')
 
-  <form action="{{ route('admin.settings.update') }}" method="POST">
+  <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
     @csrf @method('PUT')
 
     <div class="card-admin mb-3">
@@ -192,6 +192,11 @@
           <input type="number" step="1" min="0" name="insurance_fee" class="form-control" value="{{ old('insurance_fee', $settings['insurance_fee'] ?? '') }}" />
           <div class="form-text">Shown as an optional add-on at checkout — the shopper picks it there, not when choosing a product option.</div>
         </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Orders per delivery window (per day)</label>
+          <input type="number" step="1" min="1" name="delivery_slot_capacity" class="form-control" value="{{ old('delivery_slot_capacity', $settings['delivery_slot_capacity'] ?? 8) }}" />
+          <div class="form-text">Morning, afternoon and evening each take this many scheduled deliveries a day; a full window can't be picked at checkout.</div>
+        </div>
       </div>
     </div>
 
@@ -329,14 +334,29 @@
         </div>
         <div class="col-md-4">
           <label class="form-label small fw-semibold">Account holder</label>
-          <input type="text" name="payment_bank_account_holder" class="form-control" placeholder="PT Sprylo Indonesia"
+          <input type="text" name="payment_bank_account_holder" class="form-control" placeholder="PT Solis Indonesia"
                  value="{{ old('payment_bank_account_holder', $settings['payment_bank_account_holder'] ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Invoice: company name</label>
+          <input type="text" name="invoice_company_name" class="form-control" placeholder="Defaults to the site name"
+                 value="{{ old('invoice_company_name', $settings['invoice_company_name'] ?? '') }}" />
+          <div class="form-text">Printed at the top of every invoice. Address, email and phone come from the Contact settings.</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Invoice: footer note</label>
+          <input type="text" name="invoice_footer_note" class="form-control" placeholder="e.g. Goods sold are not returnable without the original box."
+                 value="{{ old('invoice_footer_note', $settings['invoice_footer_note'] ?? '') }}" />
         </div>
         <div class="col-12">
           <label class="form-label small fw-semibold">QRIS image URL</label>
           <input type="text" name="payment_qris_image" class="form-control" placeholder="/storage/payment/qris.png"
                  value="{{ old('payment_qris_image', $settings['payment_qris_image'] ?? '') }}" />
-          <div class="form-text">Static QRIS image shown at checkout. Upload the image file yourself and paste its URL here — no dynamic/per-transaction QRIS is generated.</div>
+          <input type="file" name="payment_qris_file" accept="image/*" class="form-control mt-2" />
+          @if(!empty($settings['payment_qris_image']))
+            <img src="{{ $settings['payment_qris_image'] }}" alt="QRIS" class="mt-2 d-block border rounded" style="max-height:140px" />
+          @endif
+          <div class="form-text">Static QRIS image shown at checkout. Upload a new image here (it replaces the URL above) or paste an existing URL — no dynamic/per-transaction QRIS is generated.</div>
         </div>
       </div>
     </div>
@@ -374,6 +394,43 @@
           <label class="form-label small fw-semibold">Newsletter success message</label>
           <input type="text" name="newsletter_success_text" class="form-control" value="{{ old('newsletter_success_text', $settings['newsletter_success_text'] ?? '') }}" />
         </div>
+      </div>
+    </div>
+
+    @php
+      $labelFields = [
+        'categories_head_title' => 'Categories page — heading',
+        'categories_head_text' => 'Categories page — text (jumlah kategori otomatis di depan)',
+        'brands_head_title' => 'Brands page — heading',
+        'brands_head_text' => 'Brands page — text (jumlah brand otomatis di depan)',
+        'wishlist_head_title' => 'Wishlist page — heading',
+        'wishlist_head_empty_text' => 'Wishlist page — text saat kosong',
+        'cart_head_title' => 'Cart page — heading',
+        'track_head_title' => 'Track order — heading',
+        'track_head_text' => 'Track order — text',
+        'home_trending_title' => 'Home — judul seksi Trending',
+        'home_trending_link_label' => 'Home — link seksi Trending',
+        'home_trending_all_label' => 'Home — label tab "All" di Trending',
+        'home_just_for_you_title' => 'Home — judul seksi Just for you',
+        'home_just_for_you_link_label' => 'Home — link seksi Just for you',
+        'footer_categories_title' => 'Footer — judul kolom kategori',
+        'contact_label_email' => 'Contact — label email',
+        'contact_label_phone' => 'Contact — label telepon',
+        'contact_label_address' => 'Contact — label alamat',
+        'contact_label_hours' => 'Contact — label jam support',
+        'contact_form_note' => 'Contact form — catatan di atas form',
+        'privacy_last_updated' => 'Privacy policy — "Last updated" (mis. October 2026)',
+      ];
+    @endphp
+    <div class="card-admin mb-3">
+      <h6 class="fw-bold mb-3">Section Labels &amp; Page Titles</h6>
+      <div class="row g-3">
+        @foreach($labelFields as $key => $label)
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">{{ $label }}</label>
+            <input type="text" name="{{ $key }}" class="form-control" value="{{ old($key, $settings[$key] ?? '') }}" />
+          </div>
+        @endforeach
       </div>
     </div>
 

@@ -22,6 +22,9 @@
   // Insurance is an order-wide checkbox picked at checkout (not tied to any product
   // variant), so its fee is folded into the same total the courier price feeds.
   let lastShippingFee = 0;
+  // After a failed submit the form comes back with the courier the shopper had chosen; keep it
+  // selected when the list is re-fetched instead of silently switching to the cheapest one.
+  let preferredCourier = { code: courierCodeInput.value, service: courierServiceInput.value };
 
   function formatRupiah(amount) {
     return 'Rp ' + Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -91,11 +94,18 @@
       listEl.appendChild(card);
     });
 
-    // Auto-pick the cheapest option so the total is immediately accurate.
-    const firstCard = listEl.querySelector('.checkout-rate-option');
+    // Auto-pick the previously chosen courier if it's still offered, otherwise the cheapest,
+    // so the total is immediately accurate.
+    const cards = listEl.querySelectorAll('.checkout-rate-option');
+    let pickIndex = couriers.findIndex((c) => c.courier_code === preferredCourier.code
+      && c.courier_service_code === preferredCourier.service);
+    if (pickIndex < 0) pickIndex = 0;
+    preferredCourier = { code: '', service: '' };
+
+    const firstCard = cards[pickIndex];
     if (firstCard) {
       firstCard.querySelector('input').checked = true;
-      selectCourier(couriers[0], firstCard);
+      selectCourier(couriers[pickIndex], firstCard);
     }
   }
 
@@ -156,4 +166,10 @@
   });
 
   refreshBtnAvailability();
+
+  if (latInput.value && lngInput.value) {
+    checkCouriers();
+  } else {
+    syncInsuranceAndTotal();
+  }
 })();

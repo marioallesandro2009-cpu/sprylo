@@ -42,7 +42,7 @@
   </div>
 
   <div class="mt-3">
-    <form action="{{ route('admin.contact-messages.destroy', $message) }}" method="POST" onsubmit="return confirm('Delete this message?');">
+    <form action="{{ route('admin.contact-messages.destroy', $message) }}" method="POST" data-confirm="Delete this message?">
       @csrf @method('DELETE')
       <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Delete message</button>
     </form>

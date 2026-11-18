@@ -53,7 +53,7 @@ class PromoCodeController extends Controller
         $data = $request->validate([
             'code' => ['required', 'string', 'max:50', 'unique:promo_codes,code,'.($promoCode?->id ?? 'NULL')],
             'type' => ['required', 'in:percent,fixed'],
-            'value' => ['required', 'numeric', 'min:0'],
+            'value' => ['required', 'numeric', 'gt:0', $request->input('type') === 'percent' ? 'max:100' : 'max:999999999'],
             'min_subtotal' => ['nullable', 'numeric', 'min:0'],
             'expires_at' => ['nullable', 'date'],
         ]);

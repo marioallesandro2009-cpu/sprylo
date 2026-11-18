@@ -7,7 +7,7 @@
             <div class="pic"><img src="{{ $brand->logo }}" alt="{{ $brand->name }}" /></div>
           @endif
           <div class="name">{{ $brand->name }}</div>
-          <div class="count">{{ $brand->products_count }} Products</div>
+          <div class="count">{{ $ui('ui_products_count', ['count' => $brand->products_count]) }}</div>
         </a>
       @endforeach
     </div>

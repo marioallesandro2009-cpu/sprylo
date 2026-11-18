@@ -1,11 +1,11 @@
 @php
-  $siteName = $settings['site_name'] ?? 'Sprylo';
+  $siteName = $settings['site_name'] ?? 'solis';
 @endphp
 <section class="page-head">
   <div class="container">
     <div class="crumbs"><a href="{{ route('home') }}">Home</a> <span class="sep">›</span> <span>Privacy policy</span></div>
     <h1>Privacy policy</h1>
-    <p>Last updated {{ now()->format('F Y') }}. This page explains what {{ $siteName }} collects and how it's used.</p>
+    <p>Last updated {{ $settings['privacy_last_updated'] ?? now()->format('F Y') }}. This page explains what {{ $siteName }} collects and how it's used.</p>
   </div>
 </section>
 

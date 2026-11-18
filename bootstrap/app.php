@@ -18,12 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            \App\Http\Middleware\SyncDiscounts::class,
             \App\Http\Middleware\ShareSiteSettings::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'super_admin' => \App\Http\Middleware\EnsureUserIsSuperAdmin::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('admin.login'));

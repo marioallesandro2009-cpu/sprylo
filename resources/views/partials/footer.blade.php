@@ -1,5 +1,5 @@
 @php
-  $siteName = $settings['site_name'] ?? 'Sprylo';
+  $siteName = $settings['site_name'] ?? 'solis';
 @endphp
 @if(($settings['section_newsletter_enabled'] ?? '1') !== '0')
   @include('partials.newsletter')
@@ -12,7 +12,7 @@
           @if(!empty($settings['logo']))
             <img class="brand-mark" src="{{ $settings['logo'] }}" alt="{{ $siteName }}" style="object-fit:cover" />
           @else
-            <span class="brand-mark">{{ strtoupper(substr($siteName, 0, 1)) }}</span>
+            <img class="brand-mark" src="{{ asset('assets/img/logo.svg') }}" alt="{{ $siteName }}" />
           @endif
           {{ $siteName }}
         </div>
@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="footer-col">
-        <h4>Popular Categories</h4>
+        <h4>{{ $settings['footer_categories_title'] ?? 'Popular Categories' }}</h4>
         <ul>
           @foreach($categories as $category)
             <li><a href="{{ route('shop.index', ['categories' => [$category->id]]) }}">{{ $category->name }}</a></li>
@@ -34,7 +34,7 @@
       </div>
       @foreach(\App\Models\FooterLink::GROUPS as $groupKey => $groupLabel)
         <div class="footer-col">
-          <h4>{{ $groupLabel }}</h4>
+          <h4>{{ $ui('ui_footer_group_'.$groupKey) ?: $groupLabel }}</h4>
           <ul>
             @foreach($footerLinks->get($groupKey, collect()) as $link)
               <li><a href="{{ $link->url }}">{{ $link->label }}</a></li>
@@ -44,7 +44,7 @@
       @endforeach
     </div>
     <div class="footer-bottom">
-      <span>{{ $settings['footer_copyright'] ?? '© '.date('Y').' Sprylo · All rights reserved' }}</span>
+      <span>{{ $settings['footer_copyright'] ?? '' }}</span>
       @if(!empty($settings['footer_credit_text']))
         <span>{{ $settings['footer_credit_text'] }}</span>
       @endif

@@ -27,7 +27,7 @@
               <td class="text-muted small">{{ $message->created_at->format('d M Y, H:i') }}</td>
               <td class="text-end">
                 <a href="{{ route('admin.contact-messages.show', $message) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>
-                <form action="{{ route('admin.contact-messages.destroy', $message) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this message?');">
+                <form action="{{ route('admin.contact-messages.destroy', $message) }}" method="POST" class="d-inline" data-confirm="Delete this message?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                 </form>

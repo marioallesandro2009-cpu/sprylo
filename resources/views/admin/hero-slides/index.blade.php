@@ -39,7 +39,7 @@
               </td>
               <td class="text-end">
                 <a href="{{ route('admin.hero-slides.edit', $slide) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
-                <form action="{{ route('admin.hero-slides.destroy', $slide) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this slide?');">
+                <form action="{{ route('admin.hero-slides.destroy', $slide) }}" method="POST" class="d-inline" data-confirm="Delete this slide?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                 </form>

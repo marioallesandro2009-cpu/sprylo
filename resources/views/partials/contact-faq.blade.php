@@ -2,8 +2,8 @@
   <section class="section" style="background: var(--bg)">
     <div class="container">
       <div class="section-head">
-        <h2>Quick answers</h2>
-        <a href="{{ route('help.index') }}" class="view-all">Full help centre →</a>
+        <h2>{{ $ui('ui_contact_faq_title') }}</h2>
+        <a href="{{ route('help.index') }}" class="view-all">{{ $ui('ui_contact_faq_link') }}</a>
       </div>
       <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s5)">
         @foreach($faqs as $faq)

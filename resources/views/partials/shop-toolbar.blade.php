@@ -6,7 +6,7 @@
         <input type="hidden" name="{{ $key }}{{ is_array($value) ? '[]' : '' }}" value="{{ $v }}" />
       @endforeach
     @endforeach
-    <span style="font-size:var(--text-xs); color:var(--fg-mute); font-family:var(--ff-mono)">SORT</span>
+    <span style="font-size:var(--text-xs); color:var(--fg-mute); font-family:var(--ff-mono)">{{ $ui('ui_shop_sort_label') }}</span>
     <select name="sort" onchange="document.getElementById('sort-form').submit()">
       <option value="" @selected(request('sort') == '')>{{ cms('shop.sort.popular', 'Most popular') }}</option>
       <option value="price_asc" @selected(request('sort') == 'price_asc')>{{ cms('shop.sort.price_asc', 'Price: low to high') }}</option>

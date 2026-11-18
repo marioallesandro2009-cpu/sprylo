@@ -37,8 +37,27 @@ class HomeController extends Controller
             ->take(4)
             ->get();
 
+        $trendingTabs = \App\Models\Category::query()
+            ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
+            ->whereHas('products', fn ($q) => $q->where('is_active', true))
+            ->orderByDesc('products_count')
+            ->take(4)
+            ->get()
+            ->map(function (\App\Models\Category $category) {
+                $category->setRelation('trending', Product::withRatingStats()
+                    ->with('images')
+                    ->where('is_active', true)
+                    ->where('category_id', $category->id)
+                    ->orderByDesc('reviews_count')
+                    ->take(5)
+                    ->get());
+
+                return $category;
+            })
+            ->values();
+
         return view('pages.home', compact(
-            'pageMeta', 'heroSlides', 'trendingProducts', 'promoBanners', 'justForYou'
+            'pageMeta', 'heroSlides', 'trendingProducts', 'trendingTabs', 'promoBanners', 'justForYou'
         ));
     }
 }

@@ -14,7 +14,7 @@ class InvoiceCheckTest extends TestCase
     {
         $order = Order::create($overrides + [
             'order_number' => 'SPR-ABC123',
-            'invoice_number' => 'INV-202611-0001',
+            'invoice_number' => 'INV-2611-0001',
             'invoiced_at' => now(),
             'name' => 'Test Customer',
             'email' => 'customer@example.com',
@@ -52,7 +52,7 @@ class InvoiceCheckTest extends TestCase
     {
         $this->order();
 
-        $this->check('INV-202611-0001', 'customer@example.com')
+        $this->check('INV-2611-0001', 'customer@example.com')
             ->assertOk()
             ->assertSee('SPR-ABC123')
             ->assertSee('Test Keyboard')
@@ -66,19 +66,19 @@ class InvoiceCheckTest extends TestCase
     {
         $this->order();
 
-        $this->check(' inv-202611-0001 ', 'customer@example.com')->assertOk()->assertSee('SPR-ABC123');
+        $this->check(' inv-2611-0001 ', 'customer@example.com')->assertOk()->assertSee('SPR-ABC123');
     }
 
     public function test_a_wrong_email_gets_the_same_answer_as_an_unknown_number(): void
     {
         $this->order();
 
-        $wrongEmail = $this->check('INV-202611-0001', 'someone@example.com');
+        $wrongEmail = $this->check('INV-2611-0001', 'someone@example.com');
         $wrongEmail->assertRedirect(route('invoice-check.index'));
         $wrongEmail->assertSessionHasErrors('invoice_number');
         $wrongEmailMessage = session('errors')->first('invoice_number');
 
-        $unknownNumber = $this->check('INV-202611-9999', 'customer@example.com');
+        $unknownNumber = $this->check('INV-2611-9999', 'customer@example.com');
         $unknownNumber->assertSessionHasErrors('invoice_number');
 
         $this->assertSame($wrongEmailMessage, session('errors')->first('invoice_number'));
@@ -88,7 +88,7 @@ class InvoiceCheckTest extends TestCase
     {
         $this->order(['status' => 'cancelled']);
 
-        $this->check('INV-202611-0001', 'customer@example.com')
+        $this->check('INV-2611-0001', 'customer@example.com')
             ->assertOk()
             ->assertSee('CANCELLED')
             ->assertSee('no longer valid')
@@ -102,5 +102,25 @@ class InvoiceCheckTest extends TestCase
         $this->check('SPR-ABC123', 'customer@example.com')->assertSessionHasErrors('invoice_number');
 
         $this->assertNull($order->refresh()->invoice_number);
+    }
+
+    public function test_new_invoice_numbers_are_short_and_count_up_per_month(): void
+    {
+        $this->travelTo(\Carbon\CarbonImmutable::parse('2026-11-13 10:00', 'Asia/Jakarta'));
+        $service = app(\App\Services\InvoiceService::class);
+
+        $first = $this->order(['invoice_number' => null, 'invoiced_at' => null]);
+        $second = $this->order(['order_number' => 'SPR-ABC124', 'invoice_number' => null, 'invoiced_at' => null]);
+
+        $this->assertSame('INV-2611-0001', $service->ensureNumber($first));
+        $this->assertSame('INV-2611-0002', $service->ensureNumber($second));
+        $this->assertSame('INV-2611-0001', $service->ensureNumber($first->fresh()), 'a number never changes once given');
+    }
+
+    public function test_an_invoice_with_the_old_long_number_can_still_be_checked(): void
+    {
+        $this->order(['invoice_number' => 'INV-202611-0001']);
+
+        $this->check('INV-202611-0001', 'customer@example.com')->assertOk()->assertSee('INV-202611-0001');
     }
 }

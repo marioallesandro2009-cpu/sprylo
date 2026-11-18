@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $pageMeta->title ?? ($settings['site_name'] ?? 'Sprylo'))
+@section('title', $pageMeta->title ?? ($settings['site_name'] ?? 'solis'))
 @section('meta_description', $pageMeta->meta_description ?? ($settings['site_description'] ?? ''))
 
 @section('content')

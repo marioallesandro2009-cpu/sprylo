@@ -25,6 +25,10 @@ class CartController extends Controller
 
     public function add(Request $request, Product $product): RedirectResponse
     {
+        if (! $product->is_active) {
+            return back()->with('error', 'This product is no longer available.');
+        }
+
         $variantId = $request->integer('variant_id') ?: null;
         $variant = $variantId ? $product->variants()->find($variantId) : null;
 
@@ -51,13 +55,25 @@ class CartController extends Controller
 
         $qty = max(1, (int) $request->input('qty', 1));
 
+        // A flash sale only has so many units at its price; don't let the cart exceed what's left.
+        $flashLeft = ($variant ?? $product)->promo?->remaining;
+        $cap = $flashLeft !== null ? min($stock, $flashLeft) : $stock;
+
         $cart = session('cart', []);
         $key = Cart::key($product->id, $variantId);
         $currentQty = $cart[$key] ?? 0;
-        $cart[$key] = min($currentQty + $qty, $stock);
+        $requested = $currentQty + $qty;
+        $cart[$key] = min($requested, $cap);
         session(['cart' => $cart]);
 
         $label = $product->name.($variant ? ' — '.$variant->label : '');
+
+        if ($requested > $cap) {
+            $reason = $flashLeft !== null && $flashLeft < $stock ? 'left in the flash sale' : 'in stock';
+
+            return redirect()->route('cart.index')
+                ->with('warning', "Only {$cap} of {$label} {$reason} — your cart now has {$cap}.");
+        }
 
         return redirect()->route('cart.index')->with('success', $label.' added to cart.');
     }
@@ -65,6 +81,7 @@ class CartController extends Controller
     public function update(Request $request): RedirectResponse|JsonResponse
     {
         $cart = session('cart', []);
+        $adjusted = [];
 
         foreach ($request->input('qty', []) as $key => $qty) {
             $qty = (int) $qty;
@@ -79,19 +96,26 @@ class CartController extends Controller
             $product = Product::with('variants')->find($parsed['product_id']);
             $variant = $product && $parsed['variant_id'] ? $product->variants->firstWhere('id', $parsed['variant_id']) : null;
             $stock = $variant ? $variant->stock : ($product->stock ?? $qty);
+            $flashLeft = $product ? ($variant ?? $product)->promo?->remaining : null;
+            $cap = $flashLeft !== null ? min($stock, $flashLeft) : $stock;
 
-            $cart[$key] = $product ? min($qty, max($stock, 1)) : $qty;
+            $cart[$key] = $product ? min($qty, max($cap, 1)) : $qty;
+
+            if ($product && $cart[$key] < $qty) {
+                $reason = $flashLeft !== null && $flashLeft < $stock ? 'left in the flash sale' : 'in stock';
+                $adjusted[] = "only {$cart[$key]} of {$product->name} {$reason}";
+            }
         }
 
         session(['cart' => $cart]);
 
-        if ($request->wantsJson()) {
-            session()->flash('success', 'Cart updated.');
+        $warning = $adjusted ? 'Quantity adjusted: '.implode('; ', $adjusted).'.' : null;
 
-            return $this->cartFragmentResponse();
+        if ($request->wantsJson()) {
+            return $this->cartFragmentResponse($warning);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Cart updated.');
+        return redirect()->route('cart.index')->with($warning ? 'warning' : 'success', $warning ?? 'Cart updated.');
     }
 
     public function remove(Request $request, Product $product): RedirectResponse|JsonResponse
@@ -115,7 +139,7 @@ class CartController extends Controller
      * Re-render the cart head + body/empty fragment for the AJAX cart flow, so the
      * client can swap it in without a full page reload.
      */
-    private function cartFragmentResponse(): JsonResponse
+    private function cartFragmentResponse(?string $warning = null): JsonResponse
     {
         $cartItems = Cart::items();
         $totals = Cart::totals($cartItems);
@@ -129,6 +153,7 @@ class CartController extends Controller
             'success' => true,
             'html' => $html,
             'cartCount' => array_sum(session('cart', [])),
+            'warning' => $warning,
         ]);
     }
 

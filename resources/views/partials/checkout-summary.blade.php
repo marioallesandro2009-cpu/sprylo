@@ -42,11 +42,10 @@
   @if($totals['promo_discount'] > 0)
     <div class="cart-line"><span>Promo · {{ $totals['promo_code'] }}</span><span class="v is-discount">−{{ rupiah($totals['promo_discount']) }}</span></div>
   @endif
-  <div class="cart-line"><span>PPN {{ \App\Support\Cart::PPN_PERCENT }}%</span><span class="v">{{ rupiah($totals['tax']) }}</span></div>
-
   <div class="cart-line is-total"><span>Total</span><span id="summary-total"
       data-base="{{ (float) $totals['subtotal'] + (float) $totals['tax'] - (float) $totals['promo_discount'] }}"
       >{{ rupiah($totals['subtotal'] + $totals['tax'] - $totals['promo_discount']) }}</span></div>
+  <div class="cart-line is-tax-note"><span>Includes PPN {{ \App\Support\Cart::PPN_PERCENT }}%</span><span class="v">{{ rupiah($totals['tax']) }}</span></div>
 
   <p class="cart-summary__note">Demo checkout · no payment is charged. Your order is recorded for our team to follow up.</p>
 </aside>

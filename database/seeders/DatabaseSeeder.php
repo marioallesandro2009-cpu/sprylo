@@ -22,8 +22,11 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             AdminUserSeeder::class,
+            SuperAdminSeeder::class,
             PageHeadingSettingSeeder::class,
+            LabelSettingSeeder::class,
             SettingSeeder::class,
+            DynamicContentSeeder::class,
             PageMetaSeeder::class,
             CategorySeeder::class,
             BrandSeeder::class,

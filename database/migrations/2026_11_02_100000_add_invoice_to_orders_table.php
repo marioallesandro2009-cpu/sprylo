@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            // Assigned the first time an invoice is generated, then never changes: INV-YYYYMM-0001, INV-YYYYMM-0002, …
+            // Assigned the first time an invoice is generated, then never changes: INV-YYMM-0001, INV-YYMM-0002, … (numbers made before 13 Nov 2026 read INV-YYYYMM-0001 and keep it)
             $table->string('invoice_number', 30)->nullable()->unique()->after('order_number');
             $table->timestamp('invoiced_at')->nullable()->after('invoice_number');
         });

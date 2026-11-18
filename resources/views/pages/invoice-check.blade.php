@@ -20,7 +20,7 @@
         <div class="field-row">
           <div class="field">
             <label for="ic-invoice-number">Invoice number</label>
-            <input id="ic-invoice-number" name="invoice_number" type="text" required maxlength="30" placeholder="INV-YYYYMM-0001"
+            <input id="ic-invoice-number" name="invoice_number" type="text" required maxlength="30" placeholder="INV-YYMM-0001"
               value="{{ old('invoice_number', $invoice['order']->invoice_number ?? '') }}" />
           </div>
           <div class="field">

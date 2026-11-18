@@ -4,11 +4,13 @@
   const latInput = document.getElementById('co-latitude');
   const lngInput = document.getElementById('co-longitude');
 
-  function showMessage(text) {
+  function showMessage(text, type) {
     const el = document.getElementById('checkout-variant-message');
-    if (!el) return;
-    el.textContent = text || '';
-    el.hidden = !text;
+    if (el) {
+      el.textContent = '';
+      el.hidden = true;
+    }
+    if (text && window.SpryloToast) window.SpryloToast(type || "info", text);
   }
 
   document.addEventListener('change', async (event) => {
@@ -34,12 +36,12 @@
       if (!res.ok || !data.success) {
         if (previous) select.value = previous;
         select.disabled = false;
-        showMessage(data.message || 'Unable to change this option right now.');
+        showMessage(data.message || 'Unable to change this option right now.', 'error');
         return;
       }
 
       summary.outerHTML = data.html;
-      showMessage(data.message);
+      showMessage(data.message, 'warning');
       document.dispatchEvent(new CustomEvent('checkout:summary-replaced'));
 
       // Price and weight may have changed, so re-quote couriers for the pinned address.
@@ -49,7 +51,7 @@
     } catch (err) {
       if (previous) select.value = previous;
       select.disabled = false;
-      showMessage('Unable to change this option right now. Please try again.');
+      showMessage('Unable to change this option right now. Please try again.', 'error');
     }
   });
 })();

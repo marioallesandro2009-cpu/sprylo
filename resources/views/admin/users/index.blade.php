@@ -54,7 +54,7 @@
                     <i class="fa-solid fa-ban"></i> Ban
                   </button>
                 @else
-                  <form action="{{ route('admin.users.activate', $user) }}" method="POST" class="d-inline" onsubmit="return confirm('Reactivate this account?');">
+                  <form action="{{ route('admin.users.activate', $user) }}" method="POST" class="d-inline" data-confirm="Reactivate this account?">
                     @csrf @method('PATCH')
                     <button type="submit" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-check"></i> Reactivate</button>
                   </form>
@@ -62,6 +62,15 @@
               </td>
             </tr>
 
+          @empty
+            <tr><td colspan="4" class="text-center text-muted py-4">No users yet.</td></tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @foreach($users as $user)
             <div class="modal fade" id="suspendModal{{ $user->id }}" tabindex="-1">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -115,12 +124,6 @@
                 </div>
               </div>
             </div>
-          @empty
-            <tr><td colspan="4" class="text-center text-muted py-4">No users yet.</td></tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
-  </div>
+  @endforeach
 
 @endsection

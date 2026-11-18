@@ -13,8 +13,14 @@
           <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
         @endforeach
       </select>
-      <noscript><button type="submit" class="btn btn-sm btn-outline-secondary">Filter</button></noscript>
+      <input type="search" name="q" value="{{ request('q') }}" class="form-control form-control-sm" style="width:260px"
+             placeholder="Search order #, name, email or phone" aria-label="Search orders" />
+      <button type="submit" class="btn btn-sm btn-admin-primary">Search</button>
+      @if(request()->hasAny(['q', 'status']) && (request('q') !== null || request('status')))
+        <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+      @endif
     </form>
+    <div class="text-muted small">{{ $orders->total() }} {{ \Illuminate\Support\Str::plural('order', $orders->total()) }}</div>
   </div>
 
   <div class="card-admin">
@@ -34,18 +40,22 @@
               <td class="text-muted small">{{ $order->created_at->format('d M Y, H:i') }}</td>
               <td class="text-end">
                 <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>
-                <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this order?');">
+                <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="d-inline" data-confirm="Delete this order?">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                 </form>
               </td>
             </tr>
           @empty
-            <tr><td colspan="7" class="text-center text-muted py-4">No orders yet.</td></tr>
+            <tr><td colspan="7" class="text-center text-muted py-4">{{ request()->hasAny(['q', 'status']) ? 'No orders match your search.' : 'No orders yet.' }}</td></tr>
           @endforelse
         </tbody>
       </table>
     </div>
   </div>
+
+  @if($orders->hasPages())
+    <div class="mt-3">{{ $orders->links('pagination::bootstrap-5') }}</div>
+  @endif
 
 @endsection

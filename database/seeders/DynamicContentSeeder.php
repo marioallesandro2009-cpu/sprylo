@@ -1,0 +1,177 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\NavLink;
+use App\Models\Setting;
+use Illuminate\Database\Seeder;
+
+/**
+ * Seeds the editable storefront texts (Admin > Page Texts) and the navigation menu.
+ * Safe to run repeatedly: existing values are never overwritten.
+ */
+class DynamicContentSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $texts = [
+            'ui_crumb_home' => 'Home',
+            'ui_skip_to_content' => 'Skip to content',
+            'ui_nav_all_categories' => 'All Categories',
+            'ui_drawer_close' => 'Close ✕',
+            'ui_drawer_cta' => 'View cart →',
+            'ui_header_search_placeholder' => 'Search for products, brands, categories…',
+            'ui_footer_popular_categories' => 'Popular Categories',
+            'ui_footer_group_help' => 'Let us help you',
+            'ui_footer_group_resources' => 'Resources',
+            'ui_footer_group_company' => 'Get to know us',
+            'ui_newsletter_placeholder' => 'Enter your email',
+            'ui_newsletter_button' => 'Subscribe →',
+            'ui_newsletter_success' => 'Thanks for subscribing — your first offer is on its way.',
+            'ui_contact_crumb' => 'Contact & support',
+            'ui_contact_title' => 'Talk to us — we ship gear, but we answer messages too.',
+            'ui_contact_intro' => 'Three ways to reach our team: live chat (fastest), email, or this contact form for anything that needs an attachment. We typically reply within 4 working hours and cover support in EN, ES, FR, and DE.',
+            'ui_contact_label_email' => 'EMAIL US',
+            'ui_contact_label_phone' => 'CALL US · 24/7',
+            'ui_contact_label_address' => 'VISIT OUR FLAGSHIP',
+            'ui_contact_label_hours' => 'SUPPORT HOURS',
+            'ui_contact_form_title' => 'Send us a message',
+            'ui_contact_form_note' => 'No bots, no templated replies — a real person at our SF or Berlin desks will pick this up.',
+            'ui_contact_form_first_name' => 'First name',
+            'ui_contact_form_first_name_placeholder' => 'Mira',
+            'ui_contact_form_last_name' => 'Last name',
+            'ui_contact_form_last_name_placeholder' => 'Kapoor',
+            'ui_contact_form_email' => 'Email',
+            'ui_contact_form_email_placeholder' => 'you@example.com',
+            'ui_contact_form_phone' => 'Phone (optional)',
+            'ui_contact_form_phone_placeholder' => '+1 (415) 555 0123',
+            'ui_contact_form_topic' => 'What is this about?',
+            'ui_contact_form_topics' => implode("\n", ['Order — tracking, change, or cancellation', 'Returns or refunds', 'Warranty claim or product issue', 'Trade / wholesale inquiry', 'Press, partnership, or affiliate', 'Something else']),
+            'ui_contact_form_order' => 'Order number (if applicable)',
+            'ui_contact_form_order_placeholder' => 'e.g. SPR-204418',
+            'ui_contact_form_message' => 'Your message',
+            'ui_contact_form_message_placeholder' => 'Tell us what\'s going on. Screenshots welcome — drag and drop after sending.',
+            'ui_contact_form_submit' => 'Send message →',
+            'ui_contact_privacy_prefix' => 'By submitting, you agree to our',
+            'ui_contact_privacy_link' => 'privacy policy',
+            'ui_contact_privacy_suffix' => '. We never sell your data and never share with third parties.',
+            'ui_contact_faq_title' => 'Quick answers',
+            'ui_contact_faq_link' => 'Full help centre →',
+            'ui_hours_title' => 'Hours',
+            'ui_help_crumb' => 'Help centre',
+            'ui_help_title' => 'Help centre',
+            'ui_help_intro' => 'Answers to the questions we get asked most. Can\'t find what you need?',
+            'ui_help_link' => 'Send us a message',
+            'ui_help_outro' => 'and we\'ll get back to you.',
+            'ui_help_empty' => 'No help articles yet.',
+            'ui_shop_crumb' => 'Shop · All products',
+            'ui_shop_title' => 'All Products',
+            'ui_shop_intro' => '{count} products across smartphones, laptops, audio, cameras, wearables, and gaming. Use the filters on the left to narrow down by brand, price, rating, or availability.',
+            'ui_shop_showing' => 'Showing {count} products',
+            'ui_shop_sort_label' => 'SORT',
+            'ui_shop_sort_popular' => 'Most popular',
+            'ui_shop_sort_price_asc' => 'Price: low to high',
+            'ui_shop_sort_price_desc' => 'Price: high to low',
+            'ui_shop_sort_newest' => 'Newest first',
+            'ui_shop_sort_rating' => 'Highest rated',
+            'ui_filters_toggle' => 'Filters',
+            'ui_filters_category' => 'Category',
+            'ui_filters_price_range' => 'Price range',
+            'ui_filters_price_min' => 'Min',
+            'ui_filters_price_max' => 'Max',
+            'ui_filters_brand' => 'Brand',
+            'ui_filters_rating' => 'Rating',
+            'ui_filters_rating_suffix' => '& up',
+            'ui_filters_availability' => 'Availability',
+            'ui_filters_in_stock' => 'In stock',
+            'ui_filters_on_sale' => 'On sale',
+            'ui_filters_new_arrivals' => 'New arrivals',
+            'ui_filters_apply' => 'Apply filters',
+            'ui_filters_clear' => 'Clear filters',
+            'ui_brands_crumb' => 'Brands',
+            'ui_brands_title' => 'Shop by brand',
+            'ui_brands_intro' => '{count} brands we carry — pick one to jump straight into filtered results.',
+            'ui_categories_crumb' => 'Categories',
+            'ui_categories_title' => 'Shop by category',
+            'ui_categories_intro' => '{count} categories to browse — pick one to jump straight into filtered results.',
+            'ui_products_count' => '{count} Products',
+            'ui_cart_crumb' => 'Shopping cart',
+            'ui_cart_title' => 'Your cart',
+            'ui_cart_intro' => '{count} items · ready to ship. {shipping_note}',
+            'ui_cart_free_shipping' => 'Free delivery on this order.',
+            'ui_cart_more_for_free' => 'Add {amount} more for free shipping.',
+            'ui_cart_empty' => 'Your cart is currently empty.',
+            'ui_cart_empty_body' => 'Looks like you haven\'t added anything to your cart yet.',
+            'ui_cart_empty_cta' => 'Browse the shop →',
+            'ui_wishlist_crumb' => 'Wishlist',
+            'ui_wishlist_title' => 'Your wishlist',
+            'ui_wishlist_filled' => '{count} item(s) saved for later.',
+            'ui_wishlist_empty' => 'Save products you like to find them here.',
+            'ui_wishlist_empty_body' => 'Nothing here yet — tap the heart on any product to save it.',
+            'ui_wishlist_empty_cta' => 'Browse the shop →',
+            'ui_checkout_crumb_cart' => 'Cart',
+            'ui_checkout_crumb' => 'Checkout',
+            'ui_checkout_title' => 'Checkout',
+            'ui_checkout_intro' => 'Enter your shipping details to place your order. This is a demo checkout — no payment is collected, and your order is saved so our team can follow up.',
+            'ui_trending_title' => 'Trending Products',
+            'ui_trending_view_all' => 'View all',
+            'ui_just_title' => 'Just for you',
+            'ui_just_more' => 'More picks',
+            'ui_just_stock' => 'IN STOCK ·',
+            'ui_just_order' => 'Order Now',
+            'ui_just_out_of_stock' => 'Out of stock',
+            'ui_discount_pct' => '{percent}% Off',
+            'ui_discount_cta' => 'Shop Now',
+            'ui_hero_cta_default' => 'Shop Now',
+            'ui_home_categories_title' => 'Shop by category',
+            'ui_home_categories_view_all' => 'View all products',
+            'ui_related_title' => 'You may also like',
+            'ui_related_view_all' => 'All products →',
+            'ui_price_from' => 'From',
+            'ui_card_order_now' => 'Order now →',
+            'ui_product_sold_out' => 'Sold out',
+            'ui_product_in_stock' => 'In stock · {stock} items',
+            'ui_product_rating' => '{average} / 5 · {count} reviews',
+            'ui_product_weight' => 'Weight:',
+            'ui_product_save' => 'Save {percent}%',
+            'ui_product_options' => 'Available options · choose at checkout',
+            'ui_product_variant_sold_out' => '(sold out)',
+            'ui_product_add_to_cart' => 'Add to cart →',
+            'ui_product_buy_now' => 'Buy now',
+            'ui_product_wishlist_add' => '♡ Add to wishlist',
+            'ui_product_wishlist_remove' => '♥ Remove from wishlist',
+            'ui_specs_title' => 'Specifications',
+            'ui_reviews_title' => 'Reviews',
+            'ui_reviews_count' => '{count} reviews',
+            'ui_reviews_empty' => 'No reviews yet — be the first to share your experience.',
+        ];
+
+        foreach ($texts as $key => $value) {
+            Setting::firstOrCreate(['key' => $key], ['value' => $value]);
+        }
+
+        if (NavLink::count() === 0) {
+            $links = [
+            ['Home', '/', 'both'],
+            ['Shop ▾', '/shop', 'both'],
+            ['Categories', '/categories', 'both'],
+            ['Brands', '/brands', 'both'],
+            ['Products', '/shop', 'both'],
+            ['About', '/about', 'both'],
+            ['Wishlist', '/wishlist', 'drawer'],
+            ['Cart', '/cart', 'both'],
+            ['Contact', '/contact', 'both'],
+            ];
+
+            foreach ($links as $i => [$label, $url, $placement]) {
+                NavLink::create([
+                    'label' => $label,
+                    'url' => $url,
+                    'placement' => $placement,
+                    'sort_order' => $i + 1,
+                    'is_active' => true,
+                ]);
+            }
+        }
+    }
+}

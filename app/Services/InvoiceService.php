@@ -44,7 +44,7 @@ class InvoiceService
                         return $order->invoice_number;
                     }
 
-                    $prefix = 'INV-'.now(Discount::DISPLAY_TZ)->format('Ym').'-';
+                    $prefix = 'INV-'.now(Discount::DISPLAY_TZ)->format('ym').'-';
                     $last = Order::where('invoice_number', 'like', $prefix.'%')->orderByDesc('invoice_number')->value('invoice_number');
                     $next = $last ? ((int) substr($last, -4)) + 1 : 1;
 

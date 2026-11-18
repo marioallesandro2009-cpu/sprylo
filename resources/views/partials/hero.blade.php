@@ -15,12 +15,12 @@
               @if($slide->description)
                 <p>{{ $slide->description }}</p>
               @endif
-              <a href="{{ $link }}" class="btn btn--paper">{{ $slide->cta_label ?: 'Shop Now' }}
+              <a href="{{ $link }}" class="btn btn--paper">{{ $slide->cta_label ?: $ui('ui_hero_cta_default') }}
                 <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </a>
             @else
               <h3>{{ $slide->heading }}</h3>
-              <a href="{{ $link }}" class="shop-now">{{ $slide->cta_label ?: 'Shop Now' }}
+              <a href="{{ $link }}" class="shop-now">{{ $slide->cta_label ?: $ui('ui_hero_cta_default') }}
                 <svg width="12" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </a>
             @endif
