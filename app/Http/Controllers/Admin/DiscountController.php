@@ -25,14 +25,27 @@ class DiscountController extends Controller
         $flash = $this->isFlash($request);
         $statusOrder = ['live' => 0, 'scheduled' => 1, 'sold_out' => 2, 'ended' => 3, 'inactive' => 4];
 
-        $discounts = Discount::with(['product', 'variant', 'category', 'brand'])
+        $all = Discount::with(['product', 'variant', 'category', 'brand'])
             ->where('is_flash', $flash)
             ->latest()
             ->get()
             ->sortBy(fn (Discount $discount) => $statusOrder[$discount->status] ?? 9)
             ->values();
 
-        return view('admin.discounts.index', $this->viewData($flash) + compact('discounts'));
+        // update 4: ringkasan, tab status dengan jumlah, dan filter status
+        $counts = $all->countBy(fn (Discount $discount) => $discount->status);
+        $status = (string) $request->query('status', '');
+        $discounts = isset($statusOrder[$status]) ? $all->where('status', $status)->values() : $all;
+
+        $stats = [
+            'live' => (int) ($counts['live'] ?? 0),
+            'scheduled' => (int) ($counts['scheduled'] ?? 0),
+            'sold' => (int) $all->sum('sold'),
+            // Sisa unit hanya dari yang sedang live dan punya kuota.
+            'remaining' => (int) $all->where('status', 'live')->sum(fn (Discount $discount) => $discount->remaining ?? 0),
+        ];
+
+        return view('admin.discounts.index', $this->viewData($flash) + compact('discounts', 'counts', 'stats', 'status') + ['total' => $all->count()]);
     }
 
     public function create(Request $request): View
@@ -100,7 +113,8 @@ class DiscountController extends Controller
     private function options(): array
     {
         return [
-            'products' => Product::with('variants:id,product_id,label')->orderBy('name')->get(['id', 'name']),
+            // update 4: harga ikut dimuat untuk pratinjau harga setelah diskon di form
+            'products' => Product::with('variants:id,product_id,label,price')->orderBy('name')->get(['id', 'name', 'price']),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'brands' => Brand::orderBy('name')->get(['id', 'name']),
         ];
