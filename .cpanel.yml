@@ -1,9 +1,4 @@
 ---
 deployment:
   tasks:
-    - /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction
-    - /usr/local/bin/php artisan migrate --force
-    - /usr/local/bin/php artisan storage:link
-    - /usr/local/bin/php artisan config:cache
-    - rm -rf /home/marp5433/public_html/store
-    - ln -s /home/marp5433/repositories/sprylo/public /home/marp5433/public_html/store
+    - command -v composer; command -v php; php -v; ls /usr/local/bin; ls /opt/cpanel; ls /opt/cpanel/ea-php*/root/usr/bin/php; curl -sS -o /dev/null -w "%{http_code}" https://getcomposer.org/installer; true
